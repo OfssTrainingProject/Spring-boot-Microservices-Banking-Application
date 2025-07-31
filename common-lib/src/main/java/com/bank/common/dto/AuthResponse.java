@@ -8,10 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDTO {
-    private Long id;
-    private String username;
-    private String email;
-    private String firstName;
-    private String lastName;
+public class AuthResponse {
+    private String token; // Placeholder for JWT
+    private UserDTO user;
 }

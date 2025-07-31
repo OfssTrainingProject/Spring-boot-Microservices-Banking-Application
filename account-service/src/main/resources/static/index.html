@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>User Account Service - Login/Register</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(45deg, #6a11cb, #2575fc);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #container {
+            background-color: rgba(0,0,0,0.6);
+            padding: 30px;
+            border-radius: 10px;
+            width: 400px;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+        input[type=text], input[type=password], input[type=email] {
+            width: 100%;
+            padding: 8px;
+            border: none;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+        button {
+            margin-top: 20px;
+            width: 100%;
+            padding: 10px;
+            background-color: #2575fc;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        #toggle-btn {
+            margin-top: 10px;
+            background-color: transparent;
+            border: none;
+            color: #a0c1ff;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        #message {
+            margin-top: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div id="container">
+    <h2 id="form-title">Register</h2>
+    <form id="user-form">
+        <div id="register-fields">
+            <label>First Name
+                <input type="text" id="firstName" required />
+            </label>
+            <label>Last Name
+                <input type="text" id="lastName" required />
+            </label>
+            <label>Mobile Number
+                <input type="text" id="mobileNumber" maxlength="10" required />
+            </label>
+            <label>Aadhar Number
+                <input type="text" id="aadharNumber" maxlength="12" required />
+            </label>
+            <label>Address
+                <input type="text" id="address" required />
+            </label>
+            <label>State
+                <input type="text" id="state" required />
+            </label>
+            <label>Pincode
+                <input type="text" id="pincode" required />
+            </label>
+        </div>
+
+        <label>Email
+            <input type="email" id="email" required />
+        </label>
+        <label>Password
+            <input type="password" id="password" required />
+        </label>
+
+        <button type="submit" id="submit-btn">Register</button>
+    </form>
+    <button id="toggle-btn">Switch to Login</button>
+    <div id="message"></div>
+</div>
+
+<script>
+    const formTitle = document.getElementById('form-title');
+    const submitBtn = document.getElementById('submit-btn');
+    const toggleBtn = document.getElementById('toggle-btn');
+    const registerFields = document.getElementById('register-fields');
+    const messageDiv = document.getElementById('message');
+
+    let isRegister = true;
+
+    toggleBtn.addEventListener('click', () => {
+        isRegister = !isRegister;
+        if (isRegister) {
+            formTitle.textContent = "Register";
+            submitBtn.textContent = "Register";
+            toggleBtn.textContent = "Switch to Login";
+            registerFields.style.display = "block";
+        } else {
+            formTitle.textContent = "Login";
+            submitBtn.textContent = "Login";
+            toggleBtn.textContent = "Switch to Register";
+            registerFields.style.display = "none";
+        }
+        messageDiv.textContent = "";
+        document.getElementById('user-form').reset();
+    });
+
+    document.getElementById('user-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const user = {
+            email: document.getElementById('email').value,
+            password: document.getElementById('password').value
+        };
+
+        if (isRegister) {
+            user.firstName = document.getElementById('firstName').value;
+            user.lastName = document.getElementById('lastName').value;
+            user.mobileNumber = document.getElementById('mobileNumber').value;
+            user.aadharNumber = document.getElementById('aadharNumber').value;
+            user.address = document.getElementById('address').value;
+            user.state = document.getElementById('state').value;
+            user.pincode = document.getElementById('pincode').value;
+        }
+
+        try {
+            const response = await fetch(isRegister ? '/register' : '/login', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(user)
+            });
+
+            const text = await response.text();
+
+            if (response.ok) {
+                messageDiv.style.color = 'lightgreen';
+            } else {
+                messageDiv.style.color = 'orange';
+            }
+            messageDiv.textContent = text;
+
+            if (response.ok && isRegister) {
+                document.getElementById('user-form').reset();
+            }
+        } catch (err) {
+            messageDiv.style.color = 'red';
+            messageDiv.textContent = "Server error. Try again later.";
+        }
+    });
+</script>
+</body>
+</html>
