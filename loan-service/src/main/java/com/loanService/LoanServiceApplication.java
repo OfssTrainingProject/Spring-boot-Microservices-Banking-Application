@@ -1,4 +1,4 @@
-package com.bank;
+package com.loanService;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
