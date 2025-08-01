@@ -2,7 +2,7 @@ package com.bank.userservice.controller;
 
 
 
-
+import java.util.logging.Logger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +15,7 @@ import com.bank.common.dto.UserDTO;
 import com.bank.userservice.service.UserService;
 
 import jakarta.validation.Valid;
-
+@CrossOrigin(origins = "http://127.0.0.1:5555")
 @RestController
 @RequestMapping("/user")
 @RequiredArgsConstructor
@@ -34,6 +34,7 @@ public class UserController {
 
     @PostMapping("/signin")
     public ResponseEntity<AuthResponse> signIn(@Valid @RequestBody AuthRequest authRequest) {
+        System.out.println("Authentication request: " + authRequest);
         return ResponseEntity.ok(userService.authenticate(authRequest));
     }
 }

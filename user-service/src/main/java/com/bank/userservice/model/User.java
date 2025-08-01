@@ -1,4 +1,3 @@
-
 package com.bank.userservice.model;
 
 import jakarta.persistence.Entity;

@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Bank - Modern Banking Solutions</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts - Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f8fafc;
+      scroll-behavior: smooth;
+    }
+    .hero-background {
+      background: linear-gradient(135deg, #1e3a8a 0%, #172554 100%);
+    }
+    .btn-primary {
+      background-color: #2563eb;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+    .btn-primary:hover {
+      background-color: #1e40af;
+      transform: translateY(-2px);
+    }
+    .btn-secondary {
+      background-color: #e0e7ff;
+      color: #2563eb;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+    .btn-secondary:hover {
+      background-color: #c7d2fe;
+      transform: translateY(-2px);
+    }
+    input:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
+    }
+    .card-shadow {
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    .auth-container {
+      background-color: #ffffff;
+      border-radius: 1rem;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 480px;
+      position: relative;
+      transform: translateY(20px);
+      opacity: 0;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+    .modal-overlay.active .auth-container {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    .form-message {
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+      margin-top: 1rem;
+      text-align: center;
+      font-weight: 500;
+    }
+    .form-message.success {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+    .form-message.error {
+      background-color: #fee2e2;
+      color: #991b1b;
+    }
+    .register-page {
+      display: none;
+      min-height: 100vh;
+      background-color: #f8fafc;
+      padding: 2rem;
+    }
+    .register-page.active {
+      display: block;
+    }
+    .register-container {
+      background-color: #ffffff;
+      border-radius: 1rem;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      padding: 2.5rem;
+      max-width: 600px;
+      margin: 2rem auto;
+    }
+  </style>
+</head>
+<body class="text-gray-900">
+
+<!-- Header -->
+<header class="bg-white shadow-md py-4 sticky top-0 z-50">
+  <div class="container mx-auto px-4 flex justify-between items-center">
+    <a href="#" class="text-2xl font-bold text-blue-800 rounded-md p-2 hover:bg-blue-50 transition-colors">Your Bank</a>
+    <nav>
+      <ul class="flex space-x-6 items-center">
+        <li><a href="#home" class="text-gray-700 hover:text-blue-600 font-medium transition-colors rounded-md p-2 hover:bg-gray-100">Home</a></li>
+        <li><a href="#services" class="text-gray-700 hover:text-blue-600 font-medium transition-colors rounded-md p-2 hover:bg-gray-100">Services</a></li>
+        <li><a href="#about" class="text-gray-700 hover:text-blue-600 font-medium transition-colors rounded-md p-2 hover:bg-gray-100">About Us</a></li>
+        <li><a href="#contact" class="text-gray-700 hover:text-blue-600 font-medium transition-colors rounded-md p-2 hover:bg-gray-100">Contact</a></li>
+        <li>
+          <button id="headerLoginBtn" class="btn-primary text-white font-semibold py-2 px-4 rounded-full text-sm shadow-md hover:shadow-lg">
+            Login
+          </button>
+        </li>
+        <li>
+          <button id="headerRegisterBtn" class="btn-secondary font-semibold py-2 px-4 rounded-full text-sm shadow-md hover:shadow-lg">
+            Register
+          </button>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<!-- Main Content -->
+<main id="mainContent">
+  <!-- Hero Section -->
+  <section id="home" class="hero-background text-white py-20 md:py-32 text-center rounded-b-lg shadow-lg">
+    <div class="container mx-auto px-4">
+      <h1 class="text-4xl md:text-6xl font-extrabold leading-tight mb-6 animate-fade-in-up">
+        Your Future, Secured with Your Bank
+      </h1>
+      <p class="text-lg md:text-xl mb-10 max-w-3xl mx-auto opacity-90 animate-fade-in">
+        Experience seamless banking, innovative solutions, and trusted financial partnership.
+      </p>
+      <button id="heroRegisterBtn" class="btn-primary inline-block text-white font-semibold py-3 px-8 rounded-full text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+        Open an Account Today
+      </button>
+    </div>
+  </section>
+
+  <!-- Services Section -->
+  <section id="services" class="py-16 md:py-24 bg-white">
+    <div class="container mx-auto px-4">
+      <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 text-blue-800">Our Comprehensive Services</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div class="bg-gray-50 p-8 rounded-xl card-shadow hover:shadow-xl transition-shadow duration-300 transform hover:-translate-y-1">
+          <div class="text-blue-600 text-5xl mb-4 text-center">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 mx-auto">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9H19.5m-16.5 5.25h16.5m-13.5-9L12 3l9.75 6.75" />
+            </svg>
+          </div>
+          <h3 class="text-2xl font-semibold text-center mb-4 text-gray-800">Accounts</h3>
+          <p class="text-gray-600 text-center leading-relaxed">
+            Savings, Checking, and Investment accounts tailored for every financial goal.
+          </p>
+        </div>
+        <div class="bg-gray-50 p-8 rounded-xl card-shadow hover:shadow-xl transition-shadow duration-300 transform hover:-translate-y-1">
+          <div class="text-blue-600 text-5xl mb-4 text-center">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 mx-auto">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
+            </svg>
+          </div>
+          <h3 class="text-2xl font-semibold text-center mb-4 text-gray-800">Fund Transfers</h3>
+          <p class="text-gray-600 text-center leading-relaxed">
+            Fast, secure, and convenient money transfers, local and international.
+          </p>
+        </div>
+        <div class="bg-gray-50 p-8 rounded-xl card-shadow hover:shadow-xl transition-shadow duration-300 transform hover:-translate-y-1">
+          <div class="text-blue-600 text-5xl mb-4 text-center">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 mx-auto">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+            </svg>
+          </div>
+          <h3 class="text-2xl font-semibold text-center mb-4 text-gray-800">Loans</h3>
+          <p class="text-gray-600 text-center leading-relaxed">
+            Personal, Home, and Business loans with competitive rates and flexible terms.
+          </p>
+        </div>
+        <div class="bg-gray-50 p-8 rounded-xl card-shadow hover:shadow-xl transition-shadow duration-300 transform hover:-translate-y-1">
+          <div class="text-blue-600 text-5xl mb-4 text-center">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 mx-auto">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9H19.5m-16.5 5.25h16.5m-13.5-9L12 3l9.75 6.75" />
+            </svg>
+          </div>
+          <h3 class="text-2xl font-semibold text-center mb-4 text-gray-800">Cards</h3>
+          <p class="text-gray-600 text-center leading-relaxed">
+            Credit and Debit cards with rewards, security, and worldwide acceptance.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Us Section -->
+  <section id="about" class="py-16 md:py-24 bg-gray-100">
+    <div class="container mx-auto px-4 flex flex-col md:flex-row items-center gap-12">
+      <div class="md:w-1/2">
+        <img src="https://placehold.co/600x400/e0f2fe/1e3a8a?text=Trusted+Banking" alt="Banking Image" class="rounded-xl shadow-lg w-full h-auto object-cover">
+      </div>
+      <div class="md:w-1/2">
+        <h2 class="text-3xl md:text-4xl font-bold mb-6 text-blue-800">Why Choose Your Bank?</h2>
+        <p class="text-lg text-gray-700 mb-6 leading-relaxed">
+          At Your Bank, we are committed to providing innovative and secure financial solutions that empower our customers. With a focus on digital convenience and personalized service, we help you achieve your financial aspirations.
+        </p>
+        <ul class="space-y-4 text-gray-700 text-lg">
+          <li class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-green-500 mr-3">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Secure & Reliable Banking
+          </li>
+          <li class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-green-500 mr-3">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            24/7 Customer Support
+          </li>
+          <li class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-green-500 mr-3">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Competitive Rates & Fees
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Call to Action Section -->
+  <section id="contact" class="py-16 md:py-24 bg-blue-800 text-white text-center rounded-t-lg shadow-lg">
+    <div class="container mx-auto px-4">
+      <h2 class="text-3xl md:text-4xl font-bold mb-6">Ready to Start Your Financial Journey?</h2>
+      <p class="text-lg md:text-xl mb-10 max-w-3xl mx-auto opacity-90">
+        Join thousands of satisfied customers who trust Your Bank for their financial needs.
+      </p>
+      <button id="ctaRegisterBtn" class="btn-secondary inline-block py-3 px-8 rounded-full text-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+        Get Started Today
+      </button>
+    </div>
+  </section>
+</main>
+
+<!-- Registration Page Section -->
+<section id="registerPage" class="register-page">
+  <div class="register-container">
+    <button id="backToMainBtn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-3xl font-bold focus:outline-none">&times;</button>
+    <h1 class="text-3xl font-extrabold text-center text-blue-800 mb-8">Your Bank</h1>
+    <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">Create Your Account</h2>
+    <form id="registerForm" class="space-y-6">
+      <div>
+        <label for="registerUsername" class="block text-gray-700 text-sm font-semibold mb-2">Username</label>
+        <input type="text" id="registerUsername" name="username" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 transition-colors" placeholder="e.g., john.doe" required>
+      </div>
+      <div>
+        <label for="registerEmail" class="block text-gray-700 text-sm font-semibold mb-2">Email</label>
+        <input type="email" id="registerEmail" name="email" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 transition-colors" placeholder="e.g., john.doe@example.com" required>
+      </div>
+      <div>
+        <label for="registerFirstName" class="block text-gray-700 text-sm font-semibold mb-2">First Name</label>
+        <input type="text" id="registerFirstName" name="firstName" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 transition-colors" placeholder="e.g., John" required>
+      </div>
+      <div>
+        <label for="registerLastName" class="block text-gray-700 text-sm font-semibold mb-2">Last Name</label>
+        <input type="text" id="registerLastName" name="lastName" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 transition-colors" placeholder="e.g., Doe" required>
+      </div>
+      <div>
+        <label for="registerPassword" class="block text-gray-700 text-sm font-semibold mb-2">Password</label>
+        <input type="password" id="registerPassword" name="password" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 transition-colors" placeholder="Minimum 8 characters" required>
+      </div>
+      <div>
+        <label for="confirmPassword" class="block text-gray-700 text-sm font-semibold mb-2">Confirm Password</label>
+        <input type="password" id="confirmPassword" name="confirmPassword" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 transition-colors" placeholder="Re-enter your password" required>
+      </div>
+      <div id="registerMessage" class="form-message hidden"></div>
+      <button type="submit" class="btn-primary w-full text-white font-semibold py-3 rounded-lg text-lg shadow-md hover:shadow-lg">
+        Register
+      </button>
+      <p class="text-center text-sm text-gray-600 mt-4">
+        Already have an account? <button id="switchToLoginBtn" class="text-blue-600 hover:underline focus:outline-none">Login</button>
+      </p>
+    </form>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-gray-800 text-white py-8">
+  <div class="container mx-auto px-4 text-center">
+    <p>&copy; 2025 Your Bank. All rights reserved.</p>
+    <div class="mt-4 space-x-4">
+      <a href="#" class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a>
+      <a href="#" class="text-gray-400 hover:text-white transition-colors">Terms of Service</a>
+      <a href="#" class="text-gray-400 hover:text-white transition-colors">Contact Us</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Login Modal Overlay -->
+<div id="authModalOverlay" class="modal-overlay">
+  <div class="auth-container">
+    <button id="closeModalBtn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-3xl font-bold focus:outline-none">&times;</button>
+    <h1 class="text-3xl font-extrabold text-center text-blue-800 mb-8">Your Bank</h1>
+    <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">Welcome Back!</h2>
+    <form id="loginForm" class="space-y-6">
+      <div>
+        <label for="loginIdentifier" class="block text-gray-700 text-sm font-semibold mb-2">Mobile Number / Email</label>
+        <input type="text" id="loginIdentifier" name="username" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 transition-colors" placeholder="e.g., +919876543210 or your@email.com" required>
+      </div>
+      <div>
+        <label for="loginPassword" class="block text-gray-700 text-sm font-semibold mb-2">Password</label>
+        <input type="password" id="loginPassword" name="password" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 transition-colors" placeholder="Enter your password" required>
+      </div>
+      <div id="loginMessage" class="form-message hidden"></div>
+      <button type="submit" class="btn-primary w-full text-white font-semibold py-3 rounded-lg text-lg shadow-md hover:shadow-lg">
+        Login
+      </button>
+      <p class="text-center text-sm text-gray-600 mt-4">
+        <a href="#" class="text-blue-600 hover:underline">Forgot Password?</a>
+      </p>
+      <p class="text-center text-sm text-gray-600 mt-2">
+        Don't have an account? <button id="switchToRegisterBtn" class="text-blue-600 hover:underline focus:outline-none">Register</button>
+      </p>
+    </form>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Elements
+    const mainContent = document.getElementById('mainContent');
+    const registerPage = document.getElementById('registerPage');
+    const authModalOverlay = document.getElementById('authModalOverlay');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const headerLoginBtn = document.getElementById('headerLoginBtn');
+    const headerRegisterBtn = document.getElementById('headerRegisterBtn');
+    const heroRegisterBtn = document.getElementById('heroRegisterBtn');
+    const ctaRegisterBtn = document.getElementById('ctaRegisterBtn');
+    const backToMainBtn = document.getElementById('backToMainBtn');
+    const switchToLoginBtn = document.getElementById('switchToLoginBtn');
+    const switchToRegisterBtn = document.getElementById('switchToRegisterBtn');
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+    const loginMessage = document.getElementById('loginMessage');
+    const registerMessage = document.getElementById('registerMessage');
+
+    // Smooth scrolling for navigation links
+    document.querySelectorAll('nav a').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (!registerPage.classList.contains('active')) {
+          document.querySelector(this.getAttribute('href')).scrollIntoView({
+            behavior: 'smooth'
+          });
+        }
+      });
+    });
+
+    // Function to show main content
+    const showMainContent = () => {
+      mainContent.style.display = 'block';
+      registerPage.classList.remove('active');
+      authModalOverlay.classList.remove('active');
+      loginForm.reset();
+      registerForm.reset();
+      loginMessage.classList.add('hidden');
+      registerMessage.classList.add('hidden');
+      document.body.style.overflow = 'auto';
+    };
+
+    // Function to show registration page
+    const showRegisterPage = () => {
+      mainContent.style.display = 'none';
+      registerPage.classList.add('active');
+      authModalOverlay.classList.remove('active');
+      loginForm.reset();
+      registerForm.reset();
+      loginMessage.classList.add('hidden');
+      registerMessage.classList.add('hidden');
+      document.body.style.overflow = 'auto';
+      window.scrollTo(0, 0);
+    };
+
+    // Function to open login modal
+    const openLoginModal = () => {
+      mainContent.style.display = 'block';
+      registerPage.classList.remove('active');
+      authModalOverlay.classList.add('active');
+      loginForm.reset();
+      registerForm.reset();
+      loginMessage.classList.add('hidden');
+      registerMessage.classList.add('hidden');
+      document.body.style.overflow = 'hidden';
+    };
+
+    // Event listeners for navigation
+    headerLoginBtn.addEventListener('click', openLoginModal);
+    headerRegisterBtn.addEventListener('click', showRegisterPage);
+    heroRegisterBtn.addEventListener('click', showRegisterPage);
+    ctaRegisterBtn.addEventListener('click', showRegisterPage);
+    backToMainBtn.addEventListener('click', showMainContent);
+    switchToLoginBtn.addEventListener('click', openLoginModal);
+    switchToRegisterBtn.addEventListener('click', showRegisterPage);
+
+    // Close login modal
+    closeModalBtn.addEventListener('click', showMainContent);
+    authModalOverlay.addEventListener('click', (e) => {
+      if (e.target === authModalOverlay) {
+        showMainContent();
+      }
+    });
+
+    // Login form submission
+    loginForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      loginMessage.classList.add('hidden');
+
+      const username = document.getElementById('loginIdentifier').value.trim();
+      const password = document.getElementById('loginPassword').value.trim();
+
+      if (!username || !password) {
+        loginMessage.textContent = 'Please enter your mobile number/email and password.';
+        loginMessage.classList.remove('hidden', 'success');
+        loginMessage.classList.add('error');
+        return;
+      }
+
+      try {
+        const response = await fetch('http://localhost:8082/user/signin', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          loginMessage.textContent = data.message || 'Login successful.';
+          loginMessage.classList.remove('hidden', 'error');
+          loginMessage.classList.add('success');
+          console.log('Login successful:', data);
+          setTimeout(showMainContent, 1500);
+        } else {
+          loginMessage.textContent = data.message || 'Login failed. Please try again.';
+          loginMessage.classList.remove('hidden', 'success');
+          loginMessage.classList.add('error');
+          console.error('Login error:', data);
+        }
+      } catch (error) {
+        loginMessage.textContent = 'Network error or server unavailable. Please try again later.';
+        loginMessage.classList.remove('hidden', 'success');
+        loginMessage.classList.add('error');
+        console.error('Fetch error:', error);
+      }
+    });
+
+    // Registration form submission
+    registerForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      registerMessage.classList.add('hidden');
+
+      const username = document.getElementById('registerUsername').value.trim();
+      const email = document.getElementById('registerEmail').value.trim();
+      const firstName = document.getElementById('registerFirstName').value.trim();
+      const lastName = document.getElementById('registerLastName').value.trim();
+      const password = document.getElementById('registerPassword').value.trim();
+      const confirmPassword = document.getElementById('confirmPassword').value.trim();
+
+      if (!username || !email || !firstName || !lastName || !password || !confirmPassword) {
+        registerMessage.textContent = 'Please fill in all required fields.';
+        registerMessage.classList.remove('hidden', 'success');
+        registerMessage.classList.add('error');
+        return;
+      }
+
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        registerMessage.textContent = 'Please enter a valid email address.';
+        registerMessage.classList.remove('hidden', 'success');
+        registerMessage.classList.add('error');
+        return;
+      }
+
+      if (password.length < 8) {
+        registerMessage.textContent = 'Password must be at least 8 characters long.';
+        registerMessage.classList.remove('hidden', 'success');
+        registerMessage.classList.add('error');
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        registerMessage.textContent = 'Passwords do not match.';
+        registerMessage.classList.remove('hidden', 'success');
+        registerMessage.classList.add('error');
+        return;
+      }
+
+      try {
+        const response = await fetch('http://localhost:8082/user/signup', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            username,
+            email,
+            firstName,
+            lastName,
+            password
+          })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          registerMessage.textContent = data.message || 'Registration successful.';
+          registerMessage.classList.remove('hidden', 'error');
+          registerMessage.classList.add('success');
+          registerForm.reset();
+          console.log('Registration successful:', data);
+          setTimeout(openLoginModal, 1500);
+        } else {
+          registerMessage.textContent = data.message || 'Registration failed. Please try again.';
+          registerMessage.classList.remove('hidden', 'success');
+          registerMessage.classList.add('error');
+          console.error('Registration error:', data);
+        }
+      } catch (error) {
+        registerMessage.textContent = 'Network error or server unavailable. Please try again later.';
+        registerMessage.classList.remove('hidden', 'success');
+        registerMessage.classList.add('error');
+        console.error('Fetch error:', error);
+      }
+    });
+  });
+</script>
+</body>
+</html>

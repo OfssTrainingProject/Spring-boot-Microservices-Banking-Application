@@ -10,7 +10,7 @@ import com.bank.common.dto.UserDTO;
 public interface UserService {
 	public UserDTO createUser(SignUpRequest userDTO) ;
 
-    public UserDTO getUser(Long id) ;
+	public UserDTO getUser(Long id) ;
 
 	public AuthResponse authenticate(AuthRequest authRequest);
 }
