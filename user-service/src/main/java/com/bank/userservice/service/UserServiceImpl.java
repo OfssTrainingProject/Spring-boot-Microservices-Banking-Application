@@ -10,6 +10,7 @@ import com.bank.userservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,7 @@ public class UserServiceImpl implements UserService{
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+    
     @Transactional
     public UserDTO createUser(SignUpRequest signUpRequest) {
         if (userRepository.findByUsername(signUpRequest.getUsername()) != null) {
@@ -56,5 +58,13 @@ public class UserServiceImpl implements UserService{
         authResponse.setUser(userDTO);
         authResponse.setToken("jwt-token-" + user.getId()); // Placeholder for JWT
         return authResponse;
+    }
+    
+    @Transactional
+    public void deleteUser(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("User with ID " + id + " not found"));
+        userRepository.delete(user);
+        // Database ON DELETE CASCADE handles account deletion
     }
 }

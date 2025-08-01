@@ -13,4 +13,5 @@ public interface UserService {
 	public UserDTO getUser(Long id) ;
 
 	public AuthResponse authenticate(AuthRequest authRequest);
+	public void deleteUser(Long id);
 }

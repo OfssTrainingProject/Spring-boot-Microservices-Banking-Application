@@ -14,6 +14,7 @@ import com.bank.common.dto.SignUpRequest;
 import com.bank.common.dto.UserDTO;
 import com.bank.userservice.service.UserService;
 
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 @CrossOrigin(origins = "http://127.0.0.1:5555")
 @RestController
@@ -37,4 +38,11 @@ public class UserController {
         System.out.println("Authentication request: " + authRequest);
         return ResponseEntity.ok(userService.authenticate(authRequest));
     }
+    
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable(name="id") Long id) {
+        userService.deleteUser(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }
