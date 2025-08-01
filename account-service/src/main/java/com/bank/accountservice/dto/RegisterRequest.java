@@ -1,4 +1,4 @@
-package com.useraccountservice.dto;
+package com.bank.accountservice.dto;
 
 import lombok.Data;
 

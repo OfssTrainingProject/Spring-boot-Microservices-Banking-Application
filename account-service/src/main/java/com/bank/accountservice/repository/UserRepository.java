@@ -1,7 +1,8 @@
-package com.useraccountservice.repository;
+package com.bank.accountservice.repository;
 
-import com.useraccountservice.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.bank.accountservice.model.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByAccountNumber(String accountNumber);

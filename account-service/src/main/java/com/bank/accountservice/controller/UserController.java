@@ -1,10 +1,11 @@
-package com.useraccountservice.controller;
+package com.bank.accountservice.controller;
 
-import com.useraccountservice.model.User;
-import com.useraccountservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import com.bank.accountservice.model.User;
+import com.bank.accountservice.service.UserService;
 
 @RestController
 @RequestMapping("/")

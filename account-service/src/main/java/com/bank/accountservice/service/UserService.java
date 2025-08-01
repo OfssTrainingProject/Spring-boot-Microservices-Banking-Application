@@ -1,9 +1,10 @@
-package com.useraccountservice.service;
+package com.bank.accountservice.service;
 
-import com.useraccountservice.model.User;
-import com.useraccountservice.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.bank.accountservice.model.User;
+import com.bank.accountservice.repository.UserRepository;
 
 import java.util.Random;
 

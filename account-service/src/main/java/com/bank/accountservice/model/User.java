@@ -1,4 +1,4 @@
-package com.useraccountservice.model;
+package com.bank.accountservice.model;
 
 import jakarta.persistence.*;
 
