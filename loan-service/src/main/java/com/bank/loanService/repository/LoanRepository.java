@@ -1,7 +1,8 @@
-package com.loanService.repository;
+package com.bank.loanService.repository;
 
-import com.loanService.entity.Loan;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.bank.loanService.entity.Loan;
 
 import java.util.Optional;
 

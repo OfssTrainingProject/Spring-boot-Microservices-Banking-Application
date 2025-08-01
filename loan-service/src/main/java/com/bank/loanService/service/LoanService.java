@@ -1,10 +1,11 @@
-package com.loanService.service;
+package com.bank.loanService.service;
 
-import com.loanService.dto.LoanRequest;
-import com.loanService.dto.LoanResponse;
-import com.loanService.entity.Loan;
-import com.loanService.repository.LoanRepository;
 import org.springframework.stereotype.Service;
+
+import com.bank.loanService.dto.LoanRequest;
+import com.bank.loanService.dto.LoanResponse;
+import com.bank.loanService.entity.Loan;
+import com.bank.loanService.repository.LoanRepository;
 
 import java.util.List;
 import java.util.Optional;

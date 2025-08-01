@@ -1,10 +1,11 @@
-package com.loanService.controller;
+package com.bank.loanService.controller;
 
-import com.loanService.dto.LoanRequest;
-import com.loanService.dto.LoanResponse;
-import com.loanService.service.LoanService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import com.bank.loanService.dto.LoanRequest;
+import com.bank.loanService.dto.LoanResponse;
+import com.bank.loanService.service.LoanService;
 
 import java.util.List;
 

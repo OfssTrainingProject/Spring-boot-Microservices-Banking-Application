@@ -1,4 +1,4 @@
-package com.loanService.entity;
+package com.bank.loanService.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
