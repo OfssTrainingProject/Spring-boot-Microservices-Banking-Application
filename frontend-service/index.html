@@ -240,7 +240,7 @@
             Secure & Reliable Banking
           </li>
           <li class="flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-green-500 mr-3">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 04:17 PM IST on Friday, August 01, 2025.24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-green-500 mr-3">
               <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             24/7 Customer Support
@@ -469,7 +469,11 @@
           loginMessage.classList.remove('hidden', 'error');
           loginMessage.classList.add('success');
           console.log('Login successful:', data);
-          setTimeout(showMainContent, 1500);
+          // Store username in sessionStorage
+          sessionStorage.setItem('userName', data.username || username);
+          setTimeout(() => {
+            window.location.href = '/dashboard.html';
+          }, 500);
         } else {
           loginMessage.textContent = data.message || 'Login failed. Please try again.';
           loginMessage.classList.remove('hidden', 'success');
