@@ -34,6 +34,14 @@
       background-color: #c7d2fe;
       transform: translateY(-2px);
     }
+    .btn-danger {
+      background-color: #dc2626;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+    .btn-danger:hover {
+      background-color: #b91c1c;
+      transform: translateY(-2px);
+    }
     .card-shadow {
       box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     }
@@ -50,6 +58,36 @@
     }
     ::-webkit-scrollbar-thumb:hover {
       background: #555;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal.show {
+      display: flex;
+    }
+    .modal-content {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 0.5rem;
+      width: 100%;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
     }
   </style>
 </head>
@@ -106,7 +144,7 @@
           <p class="text-gray-600 text-center leading-relaxed">
             View and manage your Savings, Checking, and Investment accounts.
           </p>
-          <a href="#" class="btn-primary mt-4 inline-block text-white font-semibold py-2 px-4 rounded-full text-sm shadow-md hover:shadow-lg">Manage Accounts</a>
+          <button id="manageAccountsBtn" class="btn-primary mt-4 inline-block text-white font-semibold py-2 px-4 rounded-full text-sm shadow-md hover:shadow-lg">Manage Accounts</button>
         </div>
         <div class="bg-gray-50 p-8 rounded-xl card-shadow hover:shadow-xl transition-shadow duration-300 transform hover:-translate-y-1">
           <div class="text-blue-600 text-5xl mb-4 text-center">
@@ -147,6 +185,74 @@
       </div>
     </div>
   </section>
+
+  <!-- Account Management Modal -->
+  <div id="accountModal" class="modal">
+    <div class="modal-content">
+      <h2 class="text-2xl font-bold mb-4 text-gray-800">Manage Accounts</h2>
+      <div class="flex space-x-4 mb-4">
+        <button id="viewAccountsTab" class="btn-primary text-white font-semibold py-2 px-4 rounded-full">View Accounts</button>
+        <button id="createAccountTab" class="btn-secondary font-semibold py-2 px-4 rounded-full">Create Account</button>
+        <button id="deleteAccountTab" class="btn-secondary font-semibold py-2 px-4 rounded-full">Delete Account</button>
+      </div>
+      <!-- View Accounts -->
+      <div id="viewAccounts" class="tab-content">
+        <h3 class="text-xl font-semibold mb-4">Your Accounts</h3>
+        <div id="accountsList" class="space-y-4"></div>
+      </div>
+      <!-- Create Account -->
+      <div id="createAccount" class="tab-content">
+        <h3 class="text-xl font-semibold mb-4">Create New Account</h3>
+        <form id="createAccountForm" class="space-y-4">
+          <div>
+            <label for="accountType" class="block text-sm font-medium text-gray-700">Account Type</label>
+            <select id="accountType" name="accountType" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required>
+              <option value="SAVINGS">Savings</option>
+              <option value="SALARY">Salary</option>
+              <option value="CURRENT">Current</option>
+            </select>
+          </div>
+          <div>
+            <label for="initialBalance" class="block text-sm font-medium text-gray-700">Initial Balance</label>
+            <input 
+              type="number" 
+              id="initialBalance" 
+              name="initialBalance" 
+              step="0.01" 
+              min="0" 
+              placeholder="Enter initial balance (e.g., 1000.00)"
+              class="mt-1 block w-full p-2 border border-gray-300 rounded-md" 
+              required>
+            <small class="text-gray-500">Minimum balance: ₹00.00</small>
+          </div>
+          <div>
+            <label for="aadhaarNumber" class="block text-sm font-medium text-gray-700">Aadhaar Number</label>
+            <input type="text" id="aadhaarNumber" name="aadhaarNumber" maxlength="12" pattern="\d{12}" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required>
+          </div>
+          <div>
+            <label for="address" class="block text-sm font-medium text-gray-700">Address</label>
+            <input type="text" id="address" name="address" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required>
+          </div>
+          <div>
+            <label for="state" class="block text-sm font-medium text-gray-700">State</label>
+            <input type="text" id="state" name="state" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required>
+          </div>
+          <div>
+            <label for="pinCode" class="block text-sm font-medium text-gray-700">Pin Code</label>
+            <input type="text" id="pinCode" name="pinCode" maxlength="6" pattern="\d{6}" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required>
+          </div>
+          <button type="submit" class="btn-primary text-white font-semibold py-2 px-4 rounded-full w-full">Create Account</button>
+        </form>
+        <p id="createAccountMessage" class="mt-4 text-sm text-gray-600"></p>
+      </div>
+      <!-- Delete Account -->
+      <div id="deleteAccount" class="tab-content">
+        <h3 class="text-xl font-semibold mb-4">Delete Accounts</h3>
+        <div id="deleteAccountsList" class="space-y-4"></div>
+      </div>
+      <button id="closeModal" class="btn-secondary mt-4 font-semibold py-2 px-4 rounded-full w-full">Close</button>
+    </div>
+  </div>
 </main>
 
 <!-- Footer -->
@@ -162,17 +268,32 @@
 </footer>
 
 <script>
+  alert("Welcome to your dashboard!");
   document.addEventListener('DOMContentLoaded', () => {
     // Elements
     const userNameSpan = document.getElementById('userName');
     const logoutBtn = document.getElementById('logoutBtn');
+    const manageAccountsBtn = document.getElementById('manageAccountsBtn');
+    const accountModal = document.getElementById('accountModal');
+    const closeModal = document.getElementById('closeModal');
+    const viewAccountsTab = document.getElementById('viewAccountsTab');
+    const createAccountTab = document.getElementById('createAccountTab');
+    const deleteAccountTab = document.getElementById('deleteAccountTab');
+    const viewAccounts = document.getElementById('viewAccounts');
+    const createAccount = document.getElementById('createAccount');
+    const deleteAccount = document.getElementById('deleteAccount');
+    const createAccountForm = document.getElementById('createAccountForm');
+    const createAccountMessage = document.getElementById('createAccountMessage');
+    const accountsList = document.getElementById('accountsList');
+    const deleteAccountsList = document.getElementById('deleteAccountsList');
 
-    // Set userName from sessionStorage
-    const storedUserName = sessionStorage.getItem('userName');
-    if (storedUserName) {
-      userNameSpan.textContent = storedUserName;
-    } else {
-      // Fallback to fetch user data if sessionStorage is empty
+    // Get userId and userName from sessionStorage
+    let userId = sessionStorage.getItem('userId') || '21';
+    let userName = sessionStorage.getItem('userName') || 'User';
+
+    // Set userName in welcome message
+    userNameSpan.textContent = userName;
+    if (!sessionStorage.getItem('userName')) {
       fetchUserData();
     }
 
@@ -193,22 +314,27 @@
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            // Add authorization header if needed, e.g., 'Authorization': 'Bearer ' + token
+            // 'Authorization': 'Bearer ' + sessionStorage.getItem('token') // Uncomment if using JWT
           }
         });
-
         if (response.ok) {
           const data = await response.json();
-          const username = data.username || 'User';
-          userNameSpan.textContent = username;
-          sessionStorage.setItem('userName', username);
+          userName = data.username || 'User';
+          userId = data.id || '21';
+          userNameSpan.textContent = userName;
+          sessionStorage.setItem('userName', userName);
+          sessionStorage.setItem('userId', userId);
         } else {
-          console.error('Failed to fetch user data');
+          console.error('Failed to fetch user data:', response.status, response.statusText);
           userNameSpan.textContent = 'User';
+          userId = '21';
+          sessionStorage.setItem('userId', userId);
         }
       } catch (error) {
-        console.error('Fetch error:', error);
+        console.error('Fetch user data error:', error);
         userNameSpan.textContent = 'User';
+        userId = '21';
+        sessionStorage.setItem('userId', userId);
       }
     }
 
@@ -219,20 +345,258 @@
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            // Add authorization header if needed
+            // 'Authorization': 'Bearer ' + sessionStorage.getItem('token') // Uncomment if using JWT
           }
         });
-
-        // Clear sessionStorage regardless of response
         sessionStorage.clear();
         window.location.href = '/index.html';
       } catch (error) {
         console.error('Logout error:', error);
-        // Clear sessionStorage and redirect even if request fails
         sessionStorage.clear();
-        window.location.href = 'index.html';
+        window.location.href = '/index.html';
       }
     });
+
+    // Modal and Tab Handling
+    manageAccountsBtn.addEventListener('click', () => {
+      accountModal.classList.add('show');
+      showTab(viewAccounts, [createAccount, deleteAccount]);
+      viewAccountsTab.classList.add('btn-primary', 'text-white');
+      viewAccountsTab.classList.remove('btn-secondary');
+      createAccountTab.classList.add('btn-secondary');
+      createAccountTab.classList.remove('btn-primary', 'text-white');
+      deleteAccountTab.classList.add('btn-secondary');
+      deleteAccountTab.classList.remove('btn-primary', 'text-white');
+      fetchAccounts();
+    });
+
+    closeModal.addEventListener('click', () => {
+      accountModal.classList.remove('show');
+      createAccountMessage.textContent = '';
+      createAccountForm.reset();
+    });
+
+    viewAccountsTab.addEventListener('click', () => {
+      showTab(viewAccounts, [createAccount, deleteAccount]);
+      viewAccountsTab.classList.add('btn-primary', 'text-white');
+      viewAccountsTab.classList.remove('btn-secondary');
+      createAccountTab.classList.add('btn-secondary');
+      createAccountTab.classList.remove('btn-primary', 'text-white');
+      deleteAccountTab.classList.add('btn-secondary');
+      deleteAccountTab.classList.remove('btn-primary', 'text-white');
+      fetchAccounts();
+    });
+
+    createAccountTab.addEventListener('click', () => {
+      showTab(createAccount, [viewAccounts, deleteAccount]);
+      createAccountTab.classList.add('btn-primary', 'text-white');
+      createAccountTab.classList.remove('btn-secondary');
+      viewAccountsTab.classList.add('btn-secondary');
+      viewAccountsTab.classList.remove('btn-primary', 'text-white');
+      deleteAccountTab.classList.add('btn-secondary');
+      deleteAccountTab.classList.remove('btn-primary', 'text-white');
+    });
+
+    deleteAccountTab.addEventListener('click', () => {
+      showTab(deleteAccount, [viewAccounts, createAccount]);
+      deleteAccountTab.classList.add('btn-primary', 'text-white');
+      deleteAccountTab.classList.remove('btn-secondary');
+      viewAccountsTab.classList.add('btn-secondary');
+      viewAccountsTab.classList.remove('btn-primary', 'text-white');
+      createAccountTab.classList.add('btn-secondary');
+      createAccountTab.classList.remove('btn-primary', 'text-white');
+      fetchAccountsForDeletion();
+    });
+
+    function showTab(activeTab, inactiveTabs) {
+      activeTab.classList.add('active');
+      inactiveTabs.forEach(tab => tab.classList.remove('active'));
+    }
+
+    // Fetch accounts for viewing
+    async function fetchAccounts() {
+      accountsList.innerHTML = '<p class="text-gray-600">Loading accounts...</p>';
+      try {
+        console.log(`Fetching accounts for userId: ${userId}`);
+        const response = await fetch(`http://localhost:8081/api/v1/account/user/${userId}?t=${new Date().getTime()}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache',
+            // 'Authorization': 'Bearer ' + sessionStorage.getItem('token') // Uncomment if using JWT
+          }
+        });
+        console.log('Fetch accounts response:', response.status, response.statusText);
+        if (!response.ok) {
+          accountsList.innerHTML = `<p class="text-red-600">Failed to load accounts: ${response.statusText}</p>`;
+          return;
+        }
+        const accounts = await response.json();
+        console.log('Accounts data:', accounts);
+        accountsList.innerHTML = '';
+        if (!Array.isArray(accounts) || accounts.length === 0) {
+          accountsList.innerHTML = '<p class="text-gray-600">No accounts found.</p>';
+          return;
+        }
+        accounts
+          .filter(account => account && account.accountType && account.accountNumber)
+          .forEach(account => {
+            const accountDiv = document.createElement('div');
+            accountDiv.className = 'bg-gray-100 p-4 rounded-md';
+            accountDiv.innerHTML = `
+              <p><strong>User:</strong> ${userName}</p>
+              <p><strong>Account Type:</strong> ${account.accountType}</p>
+              <p><strong>Account Number:</strong> ${account.accountNumber}</p>
+              <p><strong>Balance:</strong> ₹${account.balance != null ? Number(account.balance).toFixed(2) : '0.00'}</p>
+            `;
+            accountsList.appendChild(accountDiv);
+          });
+        if (accountsList.innerHTML === '') {
+          accountsList.innerHTML = '<p class="text-gray-600">No valid accounts found.</p>';
+        }
+      } catch (error) {
+        console.error('Fetch accounts error:', error);
+        accountsList.innerHTML = `<p class="text-red-600">Error loading accounts: ${error.message}</p>`;
+      }
+    }
+
+    // Fetch accounts for deletion
+    async function fetchAccountsForDeletion() {
+      deleteAccountsList.innerHTML = '<p class="text-gray-600">Loading accounts...</p>';
+      try {
+        console.log(`Fetching accounts for deletion for userId: ${userId}`);
+        const response = await fetch(`http://localhost:8081/api/v1/account/user/${userId}?t=${new Date().getTime()}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache',
+            // 'Authorization': 'Bearer ' + sessionStorage.getItem('token') // Uncomment if using JWT
+          }
+        });
+        console.log('Fetch accounts for deletion response:', response.status, response.statusText);
+        if (!response.ok) {
+          deleteAccountsList.innerHTML = `<p class="text-red-600">Failed to load accounts: ${response.statusText}</p>`;
+          return;
+        }
+        const accounts = await response.json();
+        console.log('Accounts data for deletion:', accounts);
+        deleteAccountsList.innerHTML = '';
+        if (!Array.isArray(accounts) || accounts.length === 0) {
+          deleteAccountsList.innerHTML = '<p class="text-gray-600">No accounts found.</p>';
+          return;
+        }
+        accounts
+          .filter(account => account && account.id != null && account.accountType && account.accountNumber)
+          .forEach(account => {
+            const accountDiv = document.createElement('div');
+            accountDiv.className = 'bg-gray-100 p-4 rounded-md flex justify-between items-center';
+            accountDiv.innerHTML = `
+              <div>
+                <p><strong>Account Number:</strong> ${account.accountNumber}</p>
+                <p><strong>Type:</strong> ${account.accountType}</p>
+                <p><strong>Balance:</strong> ₹${account.balance != null ? Number(account.balance).toFixed(2) : '0.00'}</p>
+              </div>
+              <button class="btn-danger text-white font-semibold py-1 px-3 rounded-full" onclick="deleteAccount(${account.id})">Delete</button>
+            `;
+            deleteAccountsList.appendChild(accountDiv);
+          });
+        if (deleteAccountsList.innerHTML === '') {
+          deleteAccountsList.innerHTML = '<p class="text-gray-600">No valid accounts found.</p>';
+        }
+      } catch (error) {
+        console.error('Fetch accounts for deletion error:', error);
+        deleteAccountsList.innerHTML = `<p class="text-red-600">Error loading accounts: ${error.message}</p>`;
+      }
+    }
+
+    // Create account
+    createAccountForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!userId) {
+        createAccountMessage.className = 'mt-4 text-sm text-red-600';
+        createAccountMessage.textContent = 'Please log in to create an account.';
+        return;
+      }
+      const formData = new FormData(createAccountForm);
+      const initialBalance = formData.get('initialBalance');
+      if (!initialBalance || isNaN(parseFloat(initialBalance)) || parseFloat(initialBalance) < 0) {
+        createAccountMessage.className = 'mt-4 text-sm text-red-600';
+        createAccountMessage.textContent = 'Please enter a valid non-negative balance.';
+        return;
+      }
+      const accountData = {
+        userId: parseInt(userId),
+        accountType: formData.get('accountType').toUpperCase(),
+        initialBalance: Number(initialBalance), // Changed from 'balance' to 'initialBalance'
+        aadhaarNumber: formData.get('aadhaarNumber'),
+        address: formData.get('address'),
+        state: formData.get('state'),
+        pinCode: formData.get('pinCode')
+      };
+      
+      try {
+        console.log('Creating account with data:', accountData);
+        const response = await fetch('http://localhost:8081/api/v1/account/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            // 'Authorization': 'Bearer ' + sessionStorage.getItem('token') // Uncomment if using JWT
+          },
+          body: JSON.stringify(accountData)
+        });
+        console.log('Create account response:', response.status, response.statusText);
+        if (response.ok) {
+          createAccountMessage.className = 'mt-4 text-sm text-green-600';
+          createAccountMessage.textContent = 'Account created successfully!';
+          createAccountForm.reset();
+          setTimeout(() => {
+            createAccountMessage.textContent = '';
+            showTab(viewAccounts, [createAccount, deleteAccount]);
+            viewAccountsTab.classList.add('btn-primary', 'text-white');
+            viewAccountsTab.classList.remove('btn-secondary');
+            createAccountTab.classList.add('btn-secondary');
+            createAccountTab.classList.remove('btn-primary', 'text-white');
+            deleteAccountTab.classList.add('btn-secondary');
+            deleteAccountTab.classList.remove('btn-primary', 'text-white');
+            fetchAccounts();
+          }, 3000);
+        } else {
+          const errorData = await response.json();
+          createAccountMessage.className = 'mt-4 text-sm text-red-600';
+          createAccountMessage.textContent = errorData.message || 'Failed to create account.';
+        }
+      } catch (error) {
+        console.error('Create account error:', error);
+        createAccountMessage.className = 'mt-4 text-sm text-red-600';
+        createAccountMessage.textContent = 'Error creating account: ' + error.message;
+      }
+    });
+
+    // Delete account
+    window.deleteAccount = async (accountId) => {
+      if (!confirm('Are you sure you want to delete this account?')) return;
+      try {
+        console.log(`Deleting account with ID: ${accountId}`);
+        const response = await fetch(`http://localhost:8081/api/v1/account/${accountId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            // 'Authorization': 'Bearer ' + sessionStorage.getItem('token') // Uncomment if using JWT
+          }
+        });
+        console.log('Delete account response:', response.status, response.statusText);
+        if (response.ok) {
+          fetchAccountsForDeletion();
+          accountsList.innerHTML = '<p class="text-green-600">Account deleted successfully.</p>';
+          setTimeout(fetchAccounts, 2000);
+        } else {
+          deleteAccountsList.innerHTML = `<p class="text-red-600">Failed to delete account: ${response.statusText}</p>`;
+        }
+      } catch (error) {
+        console.error('Delete account error:', error);
+        deleteAccountsList.innerHTML = `<p class="text-red-600">Error deleting account: ${error.message}</p>`;
+      }
+    };
   });
 </script>
 </body>
