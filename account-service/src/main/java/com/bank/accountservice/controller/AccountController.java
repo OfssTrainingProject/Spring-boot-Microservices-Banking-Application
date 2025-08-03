@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @CrossOrigin(origins = "http://127.0.0.1:5555")
 @RestController
@@ -19,7 +20,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AccountController {
     private final AccountService accountService;
-
+    
+    
+    @GetMapping("/{accountNumber}")
+    public Optional<AccountDTO> getAccountByAccountNumber(@PathVariable(name="accountNumber") String accountNumber) {
+    		return accountService.getAccountByAccountNumber(accountNumber);
+    }
+    
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<AccountDTO>> getAccountsByUserId(@PathVariable(name="userId") Long userId) {
     		System.out.println("dfss");

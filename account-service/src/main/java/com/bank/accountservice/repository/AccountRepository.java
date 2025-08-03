@@ -1,6 +1,7 @@
 package com.bank.accountservice.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -16,4 +17,6 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     void deleteById(Long id);
     boolean existsByUserIdAndAccountType(Long userId, AccountType accountType);
     boolean existsByAccountNumber(String accountNumber);
+    Optional<Account> findByAccountNumber(String accountNumber);
+
 }

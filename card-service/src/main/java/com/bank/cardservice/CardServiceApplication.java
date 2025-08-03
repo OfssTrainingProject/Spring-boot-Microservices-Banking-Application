@@ -1,8 +1,10 @@
-package com.bank;
+package com.bank.cardservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 
+@EnableFeignClients(basePackages = "com.bank.cardservice.config")
 @SpringBootApplication
 public class CardServiceApplication {
 

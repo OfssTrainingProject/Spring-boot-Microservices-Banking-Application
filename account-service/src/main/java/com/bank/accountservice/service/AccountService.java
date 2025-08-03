@@ -1,17 +1,21 @@
 package com.bank.accountservice.service;
 
 
+import com.bank.accountservice.config.CardClient;
 import com.bank.accountservice.model.Account;
 import com.bank.accountservice.repository.AccountRepository;
 import com.bank.common.dto.AccountDTO;
 import com.bank.common.dto.CreateAccountRequest;
 import com.bank.userservice.model.User;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.math.BigDecimal;
 
@@ -20,7 +24,15 @@ import java.math.BigDecimal;
 public class AccountService {
     private final AccountRepository accountRepository;
     private static final SecureRandom random = new SecureRandom();
-
+    @Autowired
+    private CardClient cardClient;
+    
+    public Optional<AccountDTO> getAccountByAccountNumber(String accountNumber) {
+        return accountRepository.findByAccountNumber(accountNumber)
+        		.map(this::convertToDTO);        
+    }
+    
+    
     public List<AccountDTO> getAccountsByUserId(Long userId) {
         List<Account> accounts = accountRepository.findByUserId(userId);
         return accounts.stream().map(this::convertToDTO).collect(Collectors.toList());
@@ -79,6 +91,7 @@ public class AccountService {
         if (!accountRepository.existsById(accountId)) {
             throw new IllegalArgumentException("Account with ID " + accountId + " not found");
         }
+        cardClient.deleteCardsByAccountNumber(accountId);
         accountRepository.deleteById(accountId);
     }
 
