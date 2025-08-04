@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Bank - Card Management</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            scroll-behavior: smooth;
+        }
+        .hero-background {
+            background: linear-gradient(135deg, #1e3a8a 0%, #172554 100%);
+        }
+        .btn-primary {
+            background-color: #2563eb;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .btn-primary:hover {
+            background-color: #1e40af;
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background-color: #e0e7ff;
+            color: #2563eb;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .btn-secondary:hover {
+            background-color: #c7d2fe;
+            transform: translateY(-2px);
+        }
+        .btn-danger {
+            background-color: #dc2626;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .btn-danger:hover {
+            background-color: #b91c1c;
+            transform: translateY(-2px);
+        }
+        .card-shadow {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        .credit-card {
+            width: 380px;
+            height: 240px;
+            border-radius: 20px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            margin: 0 auto;
+            transform-style: preserve-3d;
+            transition: all 0.3s ease;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+        .credit-card:hover {
+            transform: rotateY(5deg) rotateX(5deg);
+        }
+        .credit-card.visa {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+        }
+        .credit-card.mastercard {
+            background: linear-gradient(135deg, #eb001b, #f79e1b);
+        }
+        .credit-card.rupay {
+            background: linear-gradient(135deg, #002d62, #00aeef);
+        }
+        .credit-card.credit {
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+        }
+        .chip {
+            width: 50px;
+            height: 35px;
+            background: #ffd700;
+            border-radius: 8px;
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+        .card-number {
+            font-family: 'Courier New', monospace;
+            font-size: 24px;
+            letter-spacing: 4px;
+            margin: 60px 0 20px 0;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .card-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+        .card-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            text-transform: uppercase;
+        }
+        .card-logo {
+            font-size: 28px;
+            font-weight: 900;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .alert {
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            font-weight: 500;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+        .alert-success {
+            background-color: #10b981;
+            color: white;
+        }
+        .alert-error {
+            background-color: #dc2626;
+            color: white;
+        }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #718096;
+        }
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+        .debug-info {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: monospace;
+            font-size: 12px;
+            color: #4a5568;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body class="text-gray-900">
+    <!-- Header -->
+    <header class="bg-white shadow-md py-4 sticky top-0 z-50">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <a href="/dashboard.html" class="text-2xl font-bold text-blue-800 rounded-md p-2 hover:bg-blue-50 transition-colors">Your Bank</a>
+            <nav>
+                <ul class="flex space-x-6 items-center">
+                    <li><a href="/dashboard.html#dashboard" class="text-gray-700 hover:text-blue-600 font-medium transition-colors rounded-md p-2 hover:bg-gray-100">Dashboard</a></li>
+                    <li><a href="/dashboard.html#services" class="text-gray-700 hover:text-blue-600 font-medium transition-colors rounded-md p-2 hover:bg-gray-100">Services</a></li>
+                    <li><a href="/dashboard.html#profile" class="text-gray-700 hover:text-blue-600 font-medium transition-colors rounded-md p-2 hover:bg-gray-100">Profile</a></li>
+                    <li>
+                        <button id="logoutBtn" class="btn-primary text-white font-semibold py-2 px-4 rounded-full text-sm shadow-md hover:shadow-lg">
+                            Logout
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-background text-white py-20 text-center rounded-b-lg shadow-lg">
+            <div class="container mx-auto px-4">
+                <h1 class="text-4xl md:text-5xl font-extrabold leading-tight mb-6">
+                    Card Management
+                </h1>
+                <p class="text-lg md:text-xl mb-10 max-w-3xl mx-auto opacity-90">
+                    Manage your credit and debit cards with ease.
+                </p>
+            </div>
+        </section>
+
+        <!-- Card Management Section -->
+        <section class="py-16 bg-white">
+            <div class="container mx-auto px-4">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Search Cards Section -->
+                    <div class="bg-gray-50 p-8 rounded-xl card-shadow">
+                        <h2 class="text-2xl font-semibold mb-6 text-gray-800 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-blue-600">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                            </svg>
+                            Search Cards
+                        </h2>
+                        <div class="mb-6">
+                            <label for="searchAccountNumber" class="block text-sm font-medium text-gray-700 mb-2">Account Number</label>
+                            <input type="text" id="searchAccountNumber" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600" placeholder="Enter account number to search cards">
+                            <button class="btn-primary mt-4 text-white font-semibold py-2 px-4 rounded-full w-full" onclick="searchCardsByAccount()">
+                                <span id="searchLoader" class="loading" style="display: none;"></span>
+                                Search Cards
+                            </button>
+                        </div>
+                        <div id="cardsList" class="mt-6"></div>
+                    </div>
+
+                    <!-- Issue New Card Section -->
+                    <div class="bg-gray-50 p-8 rounded-xl card-shadow">
+                        <h2 class="text-2xl font-semibold mb-6 text-gray-800 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-blue-600">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9H19.5m-16.5 5.25h16.5m-13.5-9L12 3l9.75 6.75" />
+                            </svg>
+                            Issue New Card
+                        </h2>
+                        <div class="card-display mb-6">
+                            <div class="credit-card credit" id="cardPreview">
+                                <div class="chip"></div>
+                                <div class="card-number">•••• •••• •••• ••••</div>
+                                <div class="card-info">
+                                    <div class="card-name" id="previewName">CUSTOMER NAME</div>
+                                    <div class="card-logo" id="previewLogo">CREDIT</div>
+                                </div>
+                            </div>
+                        </div>
+                        <form id="issueCardForm" class="space-y-4">
+                            <div>
+                                <label for="cardType" class="block text-sm font-medium text-gray-700 mb-2">Card Type</label>
+                                <select id="cardType" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600" onchange="updateCardPreview()" required>
+                                    <option value="">Select Card Type</option>
+                                    <option value="CREDIT">Credit Card</option>
+                                    <option value="DEBIT">Debit Card</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="cardName" class="block text-sm font-medium text-gray-700 mb-2">Card Name</label>
+                                <input type="text" id="cardName" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600" placeholder="Enter name on card" required>
+                            </div>
+                            <div>
+                                <label for="cardIssuerCompany" class="block text-sm font-medium text-gray-700 mb-2">Card Issuer Company</label>
+                                <select id="cardIssuerCompany" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600" onchange="updateCardPreview()" required>
+                                    <option value="">Select Issuer</option>
+                                    <option value="Visa">Visa</option>
+                                    <option value="Mastercard">Mastercard</option>
+                                    <option value="Rupay">RuPay</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="accountNumber" class="block text-sm font-medium text-gray-700 mb-2">Account Number</label>
+                                <input type="text" id="accountNumber" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600" placeholder="Enter account number" required>
+                            </div>
+                            <button type="submit" class="btn-primary text-white font-semibold py-2 px-4 rounded-full w-full">
+                                <span id="submitLoader" class="loading" style="display: none;"></span>
+                                Issue Card
+                            </button>
+                        </form>
+                        <div id="successAlert" class="alert alert-success"></div>
+                        <div id="errorAlert" class="alert alert-error"></div>
+                        <div id="debugInfo" class="debug-info" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-4 text-center">
+            <p>&copy; 2025 Your Bank. All rights reserved.</p>
+            <div class="mt-4 space-x-4">
+                <a href="#" class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a>
+                <a href="#" class="text-gray-400 hover:text-white transition-colors">Terms of Service</a>
+                <a href="#" class="text-gray-400 hover:text-white transition-colors">Contact Us</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // DOM Elements
+        const cardNameInput = document.getElementById('cardName');
+        const previewName = document
+
+.getElementById('previewName');
+        const cardPreview = document.getElementById('cardPreview');
+        const previewLogo = document.getElementById('previewLogo');
+        const cardTypeSelect = document.getElementById('cardType');
+        const cardIssuerSelect = document.getElementById('cardIssuerCompany');
+        const issueCardForm = document.getElementById('issueCardForm');
+        const successAlert = document.getElementById('successAlert');
+        const errorAlert = document.getElementById('errorAlert');
+        const cardsList = document.getElementById('cardsList');
+        const debugInfo = document.getElementById('debugInfo');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        // Update card preview in real-time
+        cardNameInput.addEventListener('input', function() {
+            previewName.textContent = cardNameInput.value.toUpperCase() || 'CUSTOMER NAME';
+        });
+
+        // Update card design based on selections
+        function updateCardPreview() {
+            const cardType = cardTypeSelect.value;
+            const issuer = cardIssuerSelect.value.toLowerCase();
+            
+            if (issuer) {
+                cardPreview.className = `credit-card ${issuer}`;
+                previewLogo.textContent = cardIssuerSelect.value.toUpperCase();
+            } else {
+                cardPreview.className = 'credit-card credit';
+                previewLogo.textContent = cardType || 'CREDIT';
+            }
+        }
+
+        // Initialize card preview
+        updateCardPreview();
+
+        // Show alert function
+        function showAlert(message, type, debugData = null) {
+            const alert = type === 'success' ? successAlert : errorAlert;
+            const otherAlert = type === 'success' ? errorAlert : successAlert;
+            
+            otherAlert.style.display = 'none';
+            alert.textContent = message;
+            alert.style.display = 'block';
+            
+            if (debugData && type === 'error') {
+                debugInfo.style.display = 'block';
+                debugInfo.textContent = JSON.stringify(debugData, null, 2);
+            } else {
+                debugInfo.style.display = 'none';
+            }
+            
+            setTimeout(() => {
+                alert.style.display = 'none';
+                if (type === 'success') {
+                    debugInfo.style.display = 'none';
+                }
+            }, 5000);
+        }
+
+        // Logout functionality
+        logoutBtn.addEventListener('click', async () => {
+            try {
+                const response = await fetch('http://localhost:8082/user/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        // 'Authorization': 'Bearer ' + sessionStorage.getItem('token') // Uncomment if using JWT
+                    }
+                });
+                sessionStorage.clear();
+                window.location.href = '/index.html';
+            } catch (error) {
+                console.error('Logout error:', error);
+                sessionStorage.clear();
+                window.location.href = '/index.html';
+            }
+        });
+
+        // Issue card form submission
+        issueCardForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const loader = document.getElementById('submitLoader');
+            
+            // Show loading state
+            submitBtn.disabled = true;
+            loader.style.display = 'inline-block';
+            
+            const formData = {
+                cardType: cardTypeSelect.value.trim(),
+                cardName: cardNameInput.value.trim(),
+                cardIssuerCompany: cardIssuerSelect.value.trim(),
+                accountNumber: document.getElementById('accountNumber').value.trim()
+            };
+
+            console.log('Sending data:', formData);
+            try {
+                const response = await fetch('http://localhost:8084/api/v1/cards', {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        // 'Authorization': 'Bearer ' + sessionStorage.getItem('token') // Uncomment if using JWT
+                    },
+                    body: JSON.stringify(formData),
+                });
+
+                console.log('Response status:', response.status);
+
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('Success response:', result);
+                    showAlert('Card issued successfully!', 'success');
+                    issueCardForm.reset();
+                    updateCardPreview();
+                    previewName.textContent = 'CUSTOMER NAME';
+                } else {
+                    const errorText = await response.text();
+                    console.error('Error response:', errorText);
+                    let errorMessage = 'Failed to issue card';
+                    
+                    try {
+                        const errorData = JSON.parse(errorText);
+                        errorMessage = errorData.message || errorData.error || errorText;
+                    } catch {
+                        errorMessage = errorText || 'Unknown error occurred';
+                    }
+                    
+                    throw new Error(errorMessage);
+                }
+            } catch (error) {
+                console.error('Request failed:', error);
+                showAlert('Error: ' + error.message, 'error', {
+                    error: error.message,
+                    formData: formData,
+                    timestamp: new Date().toISOString()
+                });
+            } finally {
+                // Hide loading state
+                submitBtn.disabled = false;
+                loader.style.display = 'none';
+            }
+        });
+
+        // Search cards by account number
+        async function searchCardsByAccount() {
+            const accountNumber = document.getElementById('searchAccountNumber').value.trim();
+            
+            if (!accountNumber) {
+                showAlert('Please enter an account number', 'error');
+                return;
+            }
+
+            const searchBtn = event.target;
+            const loader = document.getElementById('searchLoader');
+            
+            // Show loading state
+            searchBtn.disabled = true;
+            loader.style.display = 'inline-block';
+            
+            try {
+                const response = await fetch(`http://localhost:8084/api/v1/cards/account/${accountNumber}`, {
+                    method: 'GET',
+                    mode: 'cors',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        // 'Authorization': 'Bearer ' + sessionStorage.getItem('token') // Uncomment if using JWT
+                    }
+                });
+                
+                console.log('Search response status:', response.status);
+                
+                if (response.ok) {
+                    const cards = await response.json();
+                    console.log('Found cards:', cards);
+                    displayCards(cards);
+                } else if (response.status === 404) {
+                    console.log('No cards found for account:', accountNumber);
+                    displayCards([]);
+                } else {
+                    const errorText = await response.text();
+                    console.error('Search error:', errorText);
+                    throw new Error('Failed to fetch cards: ' + errorText);
+                }
+            } catch (error) {
+                console.error('Search failed:', error);
+                showAlert('Error: ' + error.message, 'error');
+                cardsList.innerHTML = '';
+            } finally {
+                // Hide loading state
+                searchBtn.disabled = false;
+                loader.style.display = 'none';
+            }
+        }
+
+        // Display cards in a grid
+        function displayCards(cards) {
+            if (!cards || cards.length === 0) {
+                cardsList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">💳</div>
+                        <h3 class="text-lg font-semibold text-gray-800">No cards found</h3>
+                        <p>No cards are associated with this account number.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const cardsHTML = cards.map(card => {
+                const cardNumber = card.cardNumber ? 
+                    `**** **** **** ${card.cardNumber.slice(-4)}` : 
+                    '**** **** **** ****';
+
+                return `
+                    <div class="bg-white p-6 rounded-md card-shadow">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="inline-block bg-blue-600 text-white text-sm font-semibold py-1 px-3 rounded-full">${card.cardType || 'N/A'}</span>
+                            <span class="text-lg font-semibold text-gray-800">${card.cardIssuerCompany || 'Unknown'}</span>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600 font-medium">Name on Card:</span>
+                                <span class="font-mono">${card.cardName || 'N/A'}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600 font-medium">Account Number:</span>
+                                <span class="font-mono">${card.accountNumber || 'N/A'}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600 font-medium">Card Number:</span>
+                                <span class="font-mono">${cardNumber}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600 font-medium">Card Type:</span>
+                                <span class="font-mono">${card.cardType || 'N/A'}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600 font-medium">Card Provider:</span>
+                                <span class="font-mono">${card.cardIssuerCompany || 'N/A'}</span>
+                            </div>
+                        </div>
+                        ${card.cardId ? `<button class="btn-danger text-white font-semibold py-2 px-4 rounded-full w-full mt-4" onclick="deleteCard(${card.cardId})">Delete Card</button>` : ''}
+                    </div>
+                `;
+            }).join('');
+
+            cardsList.innerHTML = `
+                <h3 class="text-lg font-semibold mb-4 text-gray-800">Found ${cards.length} card(s)</h3>
+                <div class="space-y-4">
+                    ${cardsHTML}
+                </div>
+            `;
+        }
+
+        // Delete card function
+        async function deleteCard(cardId) {
+            if (!confirm('Are you sure you want to delete this card? This action cannot be undone.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:8084/api/v1/cards/${cardId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        // 'Authorization': 'Bearer ' + sessionStorage.getItem('token') // Uncomment if using JWT
+                    }
+                });
+
+                if (response.ok) {
+                    showAlert('Card deleted successfully!', 'success');
+                    const accountNumber = document.getElementById('searchAccountNumber').value;
+                    if (accountNumber) {
+                        searchCardsByAccount();
+                    }
+                } else {
+                    const errorText = await response.text();
+                    throw new Error('Failed to delete card: ' + errorText);
+                }
+            } catch (error) {
+                console.error('Delete failed:', error);
+                showAlert('Error: ' + error.message, 'error');
+            }
+        }
+
+        // Add Enter key support for search
+        document.getElementById('searchAccountNumber').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchCardsByAccount();
+            }
+        });
+
+        // Form validation
+        function validateForm() {
+            const cardType = cardTypeSelect.value;
+            const cardName = cardNameInput.value.trim();
+            const cardIssuer = cardIssuerSelect.value;
+            const accountNumber = document.getElementById('accountNumber').value.trim();
+
+            if (!cardType) {
+                showAlert('Please select a card type', 'error');
+                return false;
+            }
+            if (!cardName) {
+                showAlert('Please enter the name on card', 'error');
+                return false;
+            }
+            if (!cardIssuer) {
+                showAlert('Please select a card issuer', 'error');
+                return false;
+            }
+            if (!accountNumber) {
+                showAlert('Please enter an account number', 'error');
+                return false;
+            }
+
+            return true;
+        }
+
+        // Add validation to form submission
+        issueCardForm.addEventListener('submit', function(e) {
+            if (!validateForm()) {
+                e.preventDefault();
+                return false;
+            }
+        });
+    </script>
+</body>
+</html>
