@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +27,22 @@ public class AccountController {
     public Optional<AccountDTO> getAccountByAccountNumber(@PathVariable(name="accountNumber") String accountNumber) {
     		return accountService.getAccountByAccountNumber(accountNumber);
     }
+    @PostMapping("/debit/{accountNumber}")
+    public ResponseEntity<String> debitAmount(
+            @PathVariable String accountNumber,
+            @RequestBody BigDecimal amount) {
+        accountService.debitAccount(accountNumber, amount);
+        return ResponseEntity.ok("Amount debited successfully");
+    }
+
+    @PostMapping("/credit/{accountNumber}")
+    public ResponseEntity<String> creditAmount(
+            @PathVariable String accountNumber,
+            @RequestBody BigDecimal amount) {
+        accountService.creditAccount(accountNumber, amount);
+        return ResponseEntity.ok("Amount credited successfully");
+    }
+    
     
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<AccountDTO>> getAccountsByUserId(@PathVariable(name="userId") Long userId) {

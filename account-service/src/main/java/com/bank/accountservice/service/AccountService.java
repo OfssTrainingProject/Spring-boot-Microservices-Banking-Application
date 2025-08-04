@@ -32,6 +32,26 @@ public class AccountService {
         		.map(this::convertToDTO);        
     }
     
+    public void debitAccount(String accountNumber, BigDecimal amount) {
+        Account account = accountRepository.findByAccountNumber(accountNumber)
+                .orElseThrow(() -> new RuntimeException("Account not found"));
+
+        if (account.getBalance().compareTo(amount) < 0) {
+            throw new RuntimeException("Insufficient balance in your account");
+        }
+
+        account.setBalance(account.getBalance().subtract(amount));
+        accountRepository.save(account);
+    }
+
+    public void creditAccount(String accountNumber, BigDecimal amount) {
+        Account account = accountRepository.findByAccountNumber(accountNumber)
+                .orElseThrow(() -> new RuntimeException("Account not found"));
+
+        account.setBalance(account.getBalance().add(amount));
+        accountRepository.save(account);
+    }
+
     
     public List<AccountDTO> getAccountsByUserId(Long userId) {
         List<Account> accounts = accountRepository.findByUserId(userId);
