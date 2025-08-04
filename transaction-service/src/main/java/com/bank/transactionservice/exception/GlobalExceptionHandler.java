@@ -6,19 +6,23 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
 
 import feign.FeignException;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 	
     @ExceptionHandler(FeignException.class)
-    public ResponseEntity<String> handleFeignException(FeignException ex) {
-        return ResponseEntity.status(ex.status())
-                             .body("Account Service Error: " + ex.getMessage());
+    public ResponseEntity<?> handleFeignException(FeignException ex) {
+        Map<String, Object> error = new HashMap<>();
+        error.put("error", "Account Service Error");
+        error.put("message", ex.getMessage());
+        return ResponseEntity.status(ex.status()).body(error);
     }
     
     @ExceptionHandler(Exception.class)

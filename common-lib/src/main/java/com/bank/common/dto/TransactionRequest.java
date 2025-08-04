@@ -9,17 +9,21 @@ import java.math.BigDecimal;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 public class TransactionRequest {
+	
 	@NotNull(message = "User ID is required")
     private Long fromUserId;
-
+	
+	@Pattern(regexp = "\\d{12}", message = "Account number must be of 12 digits")
     @NotBlank(message = "Sender's account number is required")
     private String fromAccount;
-
+	
+	@Pattern(regexp = "\\d{12}", message = "Account number must be of 12 digits")
     @NotBlank(message = "Reciver's account number is required")
     private String toAccount;
 

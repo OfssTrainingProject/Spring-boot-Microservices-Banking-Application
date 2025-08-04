@@ -43,6 +43,7 @@ public class TransactionService {
 	public TransactionResponse transferAmount(TransactionRequest request) {
 		StringBuilder sb = new StringBuilder();
 		Transaction transaction = new Transaction();
+		transaction.setFromAccountUserId(request.getFromUserId());
 		transaction.setFromAccount(request.getFromAccount());
 		transaction.setFromAccount(request.getFromAccount());
 		transaction.setToAccount(request.getToAccount());
@@ -62,16 +63,17 @@ public class TransactionService {
 				// Step 4: Rollback debit
 				accountClient.creditAmount(request.getFromAccount(), request.getAmount());
 				transaction.setStatus(TransactionStatus.FAILED);
-				sb.append("Credit Error: " + creditEx.getMessage());
+				sb.append("Credit Error:"+"\n ");
 			}
 
 		} catch (Exception debitEx) {
 			// Debit itself failed, can't proceed
 			transaction.setStatus(TransactionStatus.FAILED);
-			transaction.setFailureReason(debitEx.getMessage());
+			sb.append("Debit Error:");
 		}
-
+		transaction.setFailureReason(sb.toString());
 		transaction = transactionRepository.save(transaction);
+		
 		return TransactionMapper.toResponse(transaction);
 
 	}

@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -17,11 +18,11 @@ public interface AccountClient {
     Optional<AccountDTO> getAccountByAccountNumber(@PathVariable("accountNumber") String accountNumber);
 
 	
-	@PutMapping("/api/v1/account/debit/{accountNumber}")
+	@PostMapping("/api/v1/account/debit/{accountNumber}")
     void debitAmount(@PathVariable("accountNumber") String accountNumber,
                      @RequestBody BigDecimal amountRequest);
 
-    @PutMapping("/api/v1/account/credit/{accountNumber}")
+    @PostMapping("/api/v1/account/credit/{accountNumber}")
     void creditAmount(@PathVariable("accountNumber") String accountNumber,
                       @RequestBody BigDecimal amountRequest);
 }

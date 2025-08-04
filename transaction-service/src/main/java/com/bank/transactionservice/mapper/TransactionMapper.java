@@ -12,7 +12,7 @@ public class TransactionMapper {
         response.setFromAccount(transaction.getFromAccount());
         response.setToAccount(transaction.getToAccount());
         response.setAmount(transaction.getAmount());
-        response.setFromAccountUserId(transaction.getFromAccountUserId());
+//        response.setFromUserId(transaction.getFromAccountUserId());
         response.setStatus(transaction.getStatus().name());
         response.setTransactionDate(transaction.getTransactionDate());
         response.setFailureReason(transaction.getFailureReason());

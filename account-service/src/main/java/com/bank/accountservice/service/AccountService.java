@@ -2,6 +2,7 @@ package com.bank.accountservice.service;
 
 
 import com.bank.accountservice.config.CardClient;
+import com.bank.accountservice.exception.AccountNotFoundException;
 import com.bank.accountservice.model.Account;
 import com.bank.accountservice.repository.AccountRepository;
 import com.bank.common.dto.AccountDTO;
@@ -34,7 +35,7 @@ public class AccountService {
     
     public void debitAccount(String accountNumber, BigDecimal amount) {
         Account account = accountRepository.findByAccountNumber(accountNumber)
-                .orElseThrow(() -> new RuntimeException("Account not found"));
+                .orElseThrow(() -> new AccountNotFoundException("Account not found"));
 
         if (account.getBalance().compareTo(amount) < 0) {
             throw new RuntimeException("Insufficient balance in your account");
@@ -46,7 +47,7 @@ public class AccountService {
 
     public void creditAccount(String accountNumber, BigDecimal amount) {
         Account account = accountRepository.findByAccountNumber(accountNumber)
-                .orElseThrow(() -> new RuntimeException("Account not found"));
+                .orElseThrow(() -> new AccountNotFoundException("Account not found"));
 
         account.setBalance(account.getBalance().add(amount));
         accountRepository.save(account);
@@ -109,7 +110,7 @@ public class AccountService {
     @Transactional
     public void deleteAccountById(Long accountId) {
         if (!accountRepository.existsById(accountId)) {
-            throw new IllegalArgumentException("Account with ID " + accountId + " not found");
+            throw new AccountNotFoundException("Account not found");
         }
         cardClient.deleteCardsByAccountNumber(accountId);
         accountRepository.deleteById(accountId);

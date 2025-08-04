@@ -14,7 +14,6 @@ public class TransactionResponse {
     private String fromAccount;
     private String toAccount;
     private BigDecimal amount;
-    private Long fromAccountUserId;
     private String status;
     private LocalDateTime transactionDate;
     private String failureReason="No Error";
