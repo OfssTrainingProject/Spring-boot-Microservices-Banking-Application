@@ -57,6 +57,6 @@ public class Card {
 		DEBIT, CREDIT
 	}
 	public enum CardIssuer{
-		MASTERCARD, RUPEY, VISA
+		MASTERCARD, RUPAY, VISA
 	}
 }
