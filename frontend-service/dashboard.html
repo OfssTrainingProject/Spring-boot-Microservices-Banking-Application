@@ -156,7 +156,7 @@
           <p class="text-gray-600 text-center leading-relaxed">
             Transfer money securely within your accounts or to others.
           </p>
-          <a href="#" class="btn-primary mt-4 inline-block text-white font-semibold py-2 px-4 rounded-full text-sm shadow-md hover:shadow-lg">Transfer Now</a>
+          <button id="transferFundsBtn" class="btn-primary mt-4 inline-block text-white font-semibold py-2 px-4 rounded-full text-sm shadow-md hover:shadow-lg">Transfer Now</button>
         </div>
         <div class="bg-gray-50 p-8 rounded-xl card-shadow hover:shadow-xl transition-shadow duration-300 transform hover:-translate-y-1">
           <div class="text-blue-600 text-5xl mb-4 text-center">
@@ -253,6 +253,32 @@
       <button id="closeModal" class="btn-secondary mt-4 font-semibold py-2 px-4 rounded-full w-full">Close</button>
     </div>
   </div>
+
+  <!-- Fund Transfer Modal -->
+  <div id="transferModal" class="modal">
+    <div class="modal-content">
+      <h2 class="text-2xl font-bold mb-4 text-gray-800">Transfer Funds</h2>
+      <form id="transferForm" class="space-y-4">
+        <div>
+          <label for="fromAccount" class="block text-sm font-medium text-gray-700">From Account</label>
+          <select id="fromAccount" name="fromAccount" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required>
+            <option value="">Select account</option>
+          </select>
+        </div>
+        <div>
+          <label for="toAccount" class="block text-sm font-medium text-gray-700">To Account</label>
+          <input type="text" id="toAccount" name="toAccount" maxlength="12" pattern="\d{12}" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" placeholder="Enter 12-digit account number" required>
+        </div>
+        <div>
+          <label for="amount" class="block text-sm font-medium text-gray-700">Amount</label>
+          <input type="number" id="amount" name="amount" step="0.01" min="0.01" placeholder="Enter amount (e.g., 500.00)" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required>
+        </div>
+        <button type="submit" class="btn-primary text-white font-semibold py-2 px-4 rounded-full w-full">Transfer</button>
+      </form>
+      <p id="transferMessage" class="mt-4 text-sm text-gray-600"></p>
+      <button id="closeTransferModal" class="btn-secondary mt-4 font-semibold py-2 px-4 rounded-full w-full">Close</button>
+    </div>
+  </div>
 </main>
 
 <!-- Footer -->
@@ -268,12 +294,12 @@
 </footer>
 
 <script>
-  alert("Welcome to your dashboard!");
   document.addEventListener('DOMContentLoaded', () => {
     // Elements
     const userNameSpan = document.getElementById('userName');
     const logoutBtn = document.getElementById('logoutBtn');
     const manageAccountsBtn = document.getElementById('manageAccountsBtn');
+    const transferFundsBtn = document.getElementById('transferFundsBtn');
     const accountModal = document.getElementById('accountModal');
     const closeModal = document.getElementById('closeModal');
     const viewAccountsTab = document.getElementById('viewAccountsTab');
@@ -286,6 +312,11 @@
     const createAccountMessage = document.getElementById('createAccountMessage');
     const accountsList = document.getElementById('accountsList');
     const deleteAccountsList = document.getElementById('deleteAccountsList');
+    const transferModal = document.getElementById('transferModal');
+    const closeTransferModal = document.getElementById('closeTransferModal');
+    const transferForm = document.getElementById('transferForm');
+    const transferMessage = document.getElementById('transferMessage');
+    const fromAccountSelect = document.getElementById('fromAccount');
 
     // Get userId and userName from sessionStorage
     let userId = sessionStorage.getItem('userId') || '21';
@@ -357,7 +388,7 @@
       }
     });
 
-    // Modal and Tab Handling
+    // Modal and Tab Handling for Account Management
     manageAccountsBtn.addEventListener('click', () => {
       accountModal.classList.add('show');
       showTab(viewAccounts, [createAccount, deleteAccount]);
@@ -408,9 +439,63 @@
       fetchAccountsForDeletion();
     });
 
+    // Fund Transfer Modal Handling
+    transferFundsBtn.addEventListener('click', async () => {
+      transferModal.classList.add('show');
+      transferMessage.textContent = '';
+      transferForm.reset();
+      await populateFromAccountOptions();
+    });
+
+    closeTransferModal.addEventListener('click', () => {
+      transferModal.classList.remove('show');
+      transferMessage.textContent = '';
+      transferForm.reset();
+    });
+
     function showTab(activeTab, inactiveTabs) {
       activeTab.classList.add('active');
       inactiveTabs.forEach(tab => tab.classList.remove('active'));
+    }
+
+    // Populate fromAccount dropdown
+    async function populateFromAccountOptions() {
+      fromAccountSelect.innerHTML = '<option value="">Select account</option>';
+      try {
+        const response = await fetch(`http://localhost:8081/api/v1/account/user/${userId}?t=${new Date().getTime()}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache',
+            // 'Authorization': 'Bearer ' + sessionStorage.getItem('token') // Uncomment if using JWT
+          }
+        });
+        if (!response.ok) {
+          transferMessage.className = 'mt-4 text-sm text-red-600';
+          transferMessage.textContent = `Failed to load accounts: ${response.statusText} (${response.status})`;
+          console.error('Populate accounts response:', response.status, response.statusText);
+          return;
+        }
+        const accounts = await response.json();
+        console.log('Accounts for transfer:', accounts);
+        if (!Array.isArray(accounts) || accounts.length === 0) {
+          transferMessage.className = 'mt-4 text-sm text-red-600';
+          transferMessage.textContent = 'No accounts available for transfer.';
+          return;
+        }
+        accounts
+          .filter(account => account && account.accountNumber)
+          .forEach(account => {
+            const option = document.createElement('option');
+            option.value = account.accountNumber;
+            option.textContent = `${account.accountType} - ${account.accountNumber} (₹${account.balance != null ? Number(account.balance).toFixed(2) : '0.00'})`;
+            fromAccountSelect.appendChild(option);
+          });
+      } catch (error) {
+        console.error('Populate accounts error:', error);
+        transferMessage.className = 'mt-4 text-sm text-red-600';
+        transferMessage.textContent = `Error loading accounts: ${error.message}`;
+      }
     }
 
     // Fetch accounts for viewing
@@ -428,7 +513,7 @@
         });
         console.log('Fetch accounts response:', response.status, response.statusText);
         if (!response.ok) {
-          accountsList.innerHTML = `<p class="text-red-600">Failed to load accounts: ${response.statusText}</p>`;
+          accountsList.innerHTML = `<p class="text-red-600">Failed to load accounts: ${response.statusText} (${response.status})</p>`;
           return;
         }
         const accounts = await response.json();
@@ -475,7 +560,7 @@
         });
         console.log('Fetch accounts for deletion response:', response.status, response.statusText);
         if (!response.ok) {
-          deleteAccountsList.innerHTML = `<p class="text-red-600">Failed to load accounts: ${response.statusText}</p>`;
+          deleteAccountsList.innerHTML = `<p class="text-red-600">Failed to load accounts: ${response.statusText} (${response.status})</p>`;
           return;
         }
         const accounts = await response.json();
@@ -527,7 +612,7 @@
       const accountData = {
         userId: parseInt(userId),
         accountType: formData.get('accountType').toUpperCase(),
-        initialBalance: Number(initialBalance), // Changed from 'balance' to 'initialBalance'
+        initialBalance: Number(initialBalance),
         aadhaarNumber: formData.get('aadhaarNumber'),
         address: formData.get('address'),
         state: formData.get('state'),
@@ -590,13 +675,96 @@
           accountsList.innerHTML = '<p class="text-green-600">Account deleted successfully.</p>';
           setTimeout(fetchAccounts, 2000);
         } else {
-          deleteAccountsList.innerHTML = `<p class="text-red-600">Failed to delete account: ${response.statusText}</p>`;
+          deleteAccountsList.innerHTML = `<p class="text-red-600">Failed to delete account: ${response.statusText} (${response.status})</p>`;
         }
       } catch (error) {
         console.error('Delete account error:', error);
         deleteAccountsList.innerHTML = `<p class="text-red-600">Error deleting account: ${error.message}</p>`;
       }
     };
+
+    // Transfer funds
+    transferForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(transferForm);
+      const fromAccount = formData.get('fromAccount');
+      const toAccount = formData.get('toAccount');
+      const amount = parseFloat(formData.get('amount'));
+
+      // Validate inputs
+      if (!fromAccount) {
+        transferMessage.className = 'mt-4 text-sm text-red-600';
+        transferMessage.textContent = 'Please select a valid source account.';
+        return;
+      }
+      if (!toAccount || !/^\d{12}$/.test(toAccount)) {
+        transferMessage.className = 'mt-4 text-sm text-red-600';
+        transferMessage.textContent = 'Please enter a valid 12-digit destination account number.';
+        return;
+      }
+      if (!amount || isNaN(amount) || amount <= 0) {
+        transferMessage.className = 'mt-4 text-sm text-red-600';
+        transferMessage.textContent = 'Please enter a valid positive amount.';
+        return;
+      }
+
+      const transferData = {
+        fromAccount,
+        toAccount,
+        amount: Number(amount)
+      };
+      
+      try {
+        console.log('Initiating fund transfer with data:', transferData);
+        console.log('Sending request to: http://localhost:8086/api/transactions');
+        const response = await fetch('http://localhost:8086/api/transactions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            // 'Authorization': 'Bearer ' + sessionStorage.getItem('token'), // Uncomment if using JWT
+            'Origin': window.location.origin
+          },
+          body: JSON.stringify(transferData),
+          mode: 'cors',
+          credentials: 'same-origin' // Adjust to 'include' if backend requires authentication cookies
+        });
+        const responseText = await response.text();
+        console.log('Transfer response:', {
+          status: response.status,
+          statusText: response.statusText,
+          body: responseText
+        });
+        if (response.ok) {
+          transferMessage.className = 'mt-4 text-sm text-green-600';
+          transferMessage.textContent = 'Transfer successful!';
+          transferForm.reset();
+          setTimeout(() => {
+            transferModal.classList.remove('show');
+            transferMessage.textContent = '';
+            fetchAccounts(); // Refresh account balances
+          }, 3000);
+        } else {
+          let errorMessage = 'Error sending the money.';
+          try {
+            const errorData = JSON.parse(responseText);
+            errorMessage = errorData.message || errorMessage;
+          } catch (e) {
+            console.warn('Could not parse error response as JSON:', responseText);
+          }
+          transferMessage.className = 'mt-4 text-sm text-red-600';
+          transferMessage.textContent = `${errorMessage} (Status: ${response.status})`;
+        }
+      } catch (error) {
+        console.error('Transfer error:', error);
+        let errorMessage = 'Error sending the money: ' + error.message;
+        if (error.message.includes('Failed to fetch')) {
+          errorMessage = 'Error sending the money: Unable to connect to the server. Please check if the backend is running at http://localhost:8086 and CORS is configured.';
+        }
+        transferMessage.className = 'mt-4 text-sm text-red-600';
+        transferMessage.textContent = errorMessage;
+      }
+    });
   });
 </script>
 </body>

@@ -463,7 +463,7 @@
         });
 
         const data = await response.json();
-
+        //alert(data.user.id);
         if (response.ok) {
           loginMessage.textContent = data.message || 'Login successful.';
           loginMessage.classList.remove('hidden', 'error');
@@ -471,6 +471,7 @@
           console.log('Login successful:', data);
           // Store username in sessionStorage
           sessionStorage.setItem('userName', data.username || username);
+          sessionStorage.setItem('userId', data.user.id);
           setTimeout(() => {
             window.location.href = '/dashboard.html';
           }, 500);
