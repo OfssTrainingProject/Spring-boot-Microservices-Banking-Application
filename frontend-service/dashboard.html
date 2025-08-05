@@ -209,7 +209,7 @@
             <p class="text-gray-600 text-center leading-relaxed">
               Explore loan options or manage existing loans with ease.
             </p>
-            <a href="#"
+            <a href="/loan.html"
               class="btn-primary mt-4 inline-block text-white font-semibold py-2 px-4 rounded-full text-sm shadow-md hover:shadow-lg">View
               Loans</a>
           </div>
@@ -269,7 +269,7 @@
               <input type="number" id="initialBalance" name="initialBalance" step="0.01" min="0"
                 placeholder="Enter initial balance (e.g., 1000.00)"
                 class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required>
-              <small class="text-gray-500">Minimum balance: ₹00.00</small>
+              <small class="text-gray-500">Minimum balance: ₹0.00</small>
             </div>
             <div>
               <label for="aadhaarNumber" class="block text-sm font-medium text-gray-700">Aadhaar Number</label>
@@ -766,7 +766,6 @@
           return;
         }
 
-
         const fromUserId = sessionStorage.getItem('userId');
 
         if (!fromUserId) {
@@ -776,18 +775,11 @@
         }
 
         const transferData = {
-          fromUserId: Number(fromUserId),  // <-- This is the fix
+          fromUserId: Number(fromUserId),
           fromAccount,
           toAccount,
           amount: Number(amount)
         };
-
-
-        // const transferData = {
-        //   fromAccount,
-        //   toAccount,
-        //   amount: Number(amount)
-        // };
 
         try {
           console.log('Initiating fund transfer with data:', transferData);
@@ -802,7 +794,7 @@
             },
             body: JSON.stringify(transferData),
             mode: 'cors',
-            credentials: 'same-origin' // Adjust to 'include' if backend requires authentication cookies
+            credentials: 'same-origin'
           });
           const responseText = await response.text();
           console.log('Transfer response:', {
@@ -817,7 +809,7 @@
             setTimeout(() => {
               transferModal.classList.remove('show');
               transferMessage.textContent = '';
-              fetchAccounts(); // Refresh account balances
+              fetchAccounts();
             }, 1000);
           } else {
             let errorMessage = 'Error sending the money.';

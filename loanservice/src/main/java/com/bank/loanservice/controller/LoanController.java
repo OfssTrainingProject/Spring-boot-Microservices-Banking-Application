@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/v1/loans")
 public class LoanController {
@@ -24,13 +24,15 @@ public class LoanController {
         return loanService.getLoansByAccountId(accountId);
     }
 
-    @GetMapping("/emi/{loanId}")
-    public String getNextEMI(@PathVariable Long loanId) {
-        return loanService.getNextEMIDetails(loanId);
+    @GetMapping("/emi/{loanNumber}")
+    public String getNextEMI(@PathVariable String loanNumber) {
+        return loanService.getNextEMIDetailsByLoanNumber(loanNumber);
     }
 
-    @PutMapping("/repay/{loanId}/{accountNumber}")
-    public String repayLoan(@PathVariable Long loanId, @PathVariable String accountNumber) {
-        return loanService.repayLoan(loanId, accountNumber);
+
+    @PutMapping("/repay/{loanNumber}/{accountNumber}")
+    public String repayLoan(@PathVariable String loanNumber, @PathVariable String accountNumber) {
+        return loanService.repayLoan(loanNumber, accountNumber);
     }
+
 }

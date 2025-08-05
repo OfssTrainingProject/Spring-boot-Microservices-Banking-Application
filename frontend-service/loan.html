@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Loan Services</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="container mx-auto p-6">
+        <h1 class="text-3xl font-bold text-center text-blue-600 mb-8">Loan Services Dashboard</h1>
+
+        <!-- Loan List Section -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h2 class="text-2xl font-semibold mb-4">Your Loans</h2>
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-blue-600 text-white">
+                        <th class="p-3">Loan Number</th>
+                        <th class="p-3">Type</th>
+                        <th class="p-3">Amount</th>
+                        <th class="p-3">Interest Rate</th>
+                        <th class="p-3">EMI Amount</th>
+                        <th class="p-3">Remaining</th>
+                        <th class="p-3">Issue Date</th>
+                        <th class="p-3">Status</th>
+                        <th class="p-3">Next EMI</th>
+                    </tr>
+                </thead>
+                <tbody id="loanTableBody" class="text-gray-700">
+                    <!-- Loan data will be populated here -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Issue New Loan Section -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h2 class="text-2xl font-semibold mb-4">Issue New Loan</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-gray-700">Amount</label>
+                    <input type="number" id="loanAmount" value="50000" class="w-full p-2 border rounded" />
+                </div>
+                <div>
+                    <label class="block text-gray-700">Term (Months)</label>
+                    <input type="number" id="termMonths" value="12" class="w-full p-2 border rounded" />
+                </div>
+                <div>
+                    <label class="block text-gray-700">Loan Type</label>
+                    <select id="loanType" class="w-full p-2 border rounded">
+                        <option value="Personal">Personal</option>
+                        <option value="Savings">Savings</option>
+                        <option value="Motor">Motor</option>
+                    </select>
+                </div>
+                <div class="flex items-end">
+                    <button onclick="issueLoan()" class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700">Issue Loan</button>
+                </div>
+            </div>
+            <p id="issueLoanMessage" class="mt-4 text-green-600 hidden"></p>
+        </div>
+
+        <!-- Repay EMI Section -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-2xl font-semibold mb-4">Repay EMI</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-gray-700">Loan Number</label>
+                    <input type="text" id="repayLoanNumber" class="w-full p-2 border rounded" placeholder="e.g. LN44749531" />
+                </div>
+                <div>
+                    <label class="block text-gray-700">Account Number</label>
+                    <input type="text" id="accountNumber" class="w-full p-2 border rounded" placeholder="e.g. 445396429695" />
+                </div>
+                <div class="flex items-end">
+                    <button onclick="repayEMI()" class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700">Repay EMI</button>
+                </div>
+            </div>
+            <p id="repayEMIMessage" class="mt-4 text-green-600 hidden"></p>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8087/api/v1/loans';
+        const accountId = sessionStorage.getItem('userId') || 21;
+
+        // Fetch and display loans
+        async function fetchLoans() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/account/${accountId}`);
+                const loans = await response.json();
+                const tableBody = document.getElementById('loanTableBody');
+                tableBody.innerHTML = '';
+
+                for (const loan of loans) {
+                    // Use loan.loanNumber to fetch next EMI (string, not ID)
+                    const nextEMIText = await fetchNextEMI(loan.loanNumber);
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="p-3 border-b">${loan.loanNumber}</td>
+                        <td class="p-3 border-b">${loan.loanType}</td>
+                        <td class="p-3 border-b">₹${loan.amount.toFixed(2)}</td>
+                        <td class="p-3 border-b">${loan.interestRate}%</td>
+                        <td class="p-3 border-b">₹${loan.emiAmount.toFixed(2)}</td>
+                        <td class="p-3 border-b">₹${loan.remainingAmount.toFixed(2)}</td>
+                        <td class="p-3 border-b">${loan.issueDate}</td>
+                        <td class="p-3 border-b">${loan.status}</td>
+                        <td class="p-3 border-b">${nextEMIText}</td>
+                    `;
+                    tableBody.appendChild(row);
+                }
+            } catch (error) {
+                console.error('Error fetching loans:', error);
+            }
+        }
+
+        // Fetch next EMI details by loanNumber
+        async function fetchNextEMI(loanNumber) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/emi/${loanNumber}`);
+                if (!response.ok) return 'N/A';
+                // Assuming your backend returns a string message like "Next EMI for Loan LN... is ₹... due on ..."
+                const text = await response.text();
+                return text;
+            } catch (error) {
+                console.error('Error fetching EMI:', error);
+                return 'N/A';
+            }
+        }
+
+        // Issue new loan
+        async function issueLoan() {
+            const amount = parseFloat(document.getElementById('loanAmount').value);
+            const termMonths = parseInt(document.getElementById('termMonths').value);
+            const loanType = document.getElementById('loanType').value;
+            const messageEl = document.getElementById('issueLoanMessage');
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/issue`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount, termMonths, accountId, loanType })
+                });
+                if (!response.ok) throw new Error('Failed to issue loan');
+                const result = await response.json();
+                messageEl.textContent = 'Loan issued successfully!';
+                messageEl.classList.remove('hidden', 'text-red-600');
+                messageEl.classList.add('text-green-600');
+                fetchLoans(); // Refresh loan list
+            } catch (error) {
+                messageEl.textContent = 'Error issuing loan: ' + error.message;
+                messageEl.classList.remove('hidden', 'text-green-600');
+                messageEl.classList.add('text-red-600');
+            }
+            setTimeout(() => messageEl.classList.add('hidden'), 3000);
+        }
+
+        // Repay EMI by loanNumber and accountNumber
+        async function repayEMI() {
+            const loanNumber = document.getElementById('repayLoanNumber').value.trim();
+            const accountNumber = document.getElementById('accountNumber').value.trim();
+            const messageEl = document.getElementById('repayEMIMessage');
+
+            if (!loanNumber || !accountNumber) {
+                messageEl.textContent = 'Please enter both Loan Number and Account Number.';
+                messageEl.classList.remove('hidden', 'text-green-600');
+                messageEl.classList.add('text-red-600');
+                setTimeout(() => messageEl.classList.add('hidden'), 3000);
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/repay/${loanNumber}/${accountNumber}`, {
+                    method: 'PUT'
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(errorText || 'Failed to repay EMI');
+                }
+                const resultText = await response.text();
+                messageEl.textContent = resultText;
+                messageEl.classList.remove('hidden', 'text-red-600');
+                messageEl.classList.add('text-green-600');
+                fetchLoans(); // Refresh loan list
+            } catch (error) {
+                messageEl.textContent = 'Error repaying EMI: ' + error.message;
+                messageEl.classList.remove('hidden', 'text-green-600');
+                messageEl.classList.add('text-red-600');
+            }
+            setTimeout(() => messageEl.classList.add('hidden'), 3000);
+        }
+
+        // Initialize page
+        fetchLoans();
+    </script>
+</body>
+</html>
