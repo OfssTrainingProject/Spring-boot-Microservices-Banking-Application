@@ -4,6 +4,7 @@ package com.bank.accountservice.controller;
 import com.bank.accountservice.service.AccountService;
 import com.bank.common.dto.AccountDTO;
 import com.bank.common.dto.CreateAccountRequest;
+import com.bank.common.dto.TransDTO;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,19 +28,15 @@ public class AccountController {
     public Optional<AccountDTO> getAccountByAccountNumber(@PathVariable(name="accountNumber") String accountNumber) {
     		return accountService.getAccountByAccountNumber(accountNumber);
     }
-    @PostMapping("/debit/{accountNumber}")
-    public ResponseEntity<String> debitAmount(
-            @PathVariable String accountNumber,
-            @RequestBody BigDecimal amount) {
-        accountService.debitAccount(accountNumber, amount);
+    @PostMapping("/debit")
+    public ResponseEntity<String> debitAmount(@Valid @RequestBody TransDTO transDTO) {
+        accountService.debitAccount(transDTO.getAccountNumber(), transDTO.getAmount());
         return ResponseEntity.ok("Amount debited successfully");
     }
 
-    @PostMapping("/credit/{accountNumber}")
-    public ResponseEntity<String> creditAmount(
-            @PathVariable String accountNumber,
-            @RequestBody BigDecimal amount) {
-        accountService.creditAccount(accountNumber, amount);
+    @PostMapping("/credit")
+    public ResponseEntity<String> creditAmount(@Valid @RequestBody TransDTO transDTO) {
+        accountService.creditAccount(transDTO.getAccountNumber(), transDTO.getAmount());
         return ResponseEntity.ok("Amount credited successfully");
     }
     
