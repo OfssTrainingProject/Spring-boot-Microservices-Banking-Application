@@ -77,7 +77,7 @@ public class TransactionService {
 		if(!sb.isEmpty()) {
 			transaction.setFailureReason(sb.toString());			
 		}else {
-			transaction.setFailureReason("Transaction sucessful");
+			transaction.setFailureReason("Transaction successful");
 		}
 	    transaction = transactionRepository.save(transaction);
 	    
