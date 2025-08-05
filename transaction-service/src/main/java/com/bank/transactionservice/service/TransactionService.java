@@ -74,10 +74,13 @@ public class TransactionService {
 	        String cleanError = extractErrorMessage(debitEx.contentUTF8());
 	        sb.append("Debit Error: ").append(cleanError);
 	    }
-
-	    transaction.setFailureReason(sb.toString());
+		if(!sb.isEmpty()) {
+			transaction.setFailureReason(sb.toString());			
+		}else {
+			transaction.setFailureReason("Transaction sucessful");
+		}
 	    transaction = transactionRepository.save(transaction);
-
+	    
 	    return TransactionMapper.toResponse(transaction);
 	}
 	private String extractErrorMessage(String responseBody) {

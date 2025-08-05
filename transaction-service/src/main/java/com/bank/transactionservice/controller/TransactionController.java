@@ -24,8 +24,13 @@ public class TransactionController {
 
     @PostMapping
     public ResponseEntity<TransactionResponse> makeTransaction(@Valid @RequestBody TransactionRequest request) {
-         TransactionResponse result = transactionService.transferAmount(request);
-         return ResponseEntity.status(HttpStatus.CREATED).body(result);
+         TransactionResponse response = transactionService.transferAmount(request);
+         
+         if ("SUCCESS".equalsIgnoreCase(response.getStatus())) {
+        	    return ResponseEntity.ok(response); // ✅ 200 OK
+        	} else {
+        	    return ResponseEntity.status(HttpStatus.CONFLICT).body(response); // ❌ 409 Conflict
+        	}
     }
     
     @GetMapping("/user/{userId}")
